@@ -4,200 +4,213 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Switch Notes Studio</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
-  <div class="switch-viewport">
-    <!-- Top Switch Header / Status Toolbar -->
-    <header class="switch-header">
-      <div class="switch-user-pill">
-        <div class="user-avatar-circle">📚</div>
-        <span class="user-title-text">Apple Books Notes</span>
-      </div>
-      <div class="switch-status-toolbar">
-        <span id="switch-clock">12:00 PM</span>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M5 12.55a11 11 0 0 1 14.08 0"></path>
-          <path d="M1.42 9a16 16 0 0 1 21.16 0"></path>
-          <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
-          <line x1="12" y1="20" x2="12.01" y2="20"></line>
-        </svg>
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="2" y="7" width="16" height="10" rx="2" ry="2"></rect>
-          <line x1="22" y1="11" x2="22" y2="13"></line>
-          <line x1="6" y1="11" x2="6" y2="13"></line>
-          <line x1="10" y1="11" x2="10" y2="13"></line>
-          <line x1="14" y1="11" x2="14" y2="13"></line>
-        </svg>
-      </div>
-    </header>
+  <!-- Authentic Switch Bezel -->
+  <div class="screen-border">
+    <div class="screen-wrapper">
+      <!-- 1. Screen Header / Status Bar -->
+      <header class="screen-header">
+        <div class="user-icon" id="profile">
+          <div class="user-avatar-badge">📖</div>
+          <span class="user-label-text">Apple Books Notes</span>
+        </div>
+        <div class="toolbar">
+          <span id="clock">12:00 PM</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12.55a11 11 0 0 1 14.08 0"></path>
+            <path d="M1.42 9a16 16 0 0 1 21.16 0"></path>
+            <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
+            <line x1="12" y1="20" x2="12.01" y2="20"></line>
+          </svg>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="7" width="16" height="10" rx="2" ry="2"></rect>
+            <line x1="22" y1="11" x2="22" y2="13"></line>
+            <line x1="6" y1="11" x2="6" y2="13"></line>
+            <line x1="10" y1="11" x2="10" y2="13"></line>
+            <line x1="14" y1="11" x2="14" y2="13"></line>
+          </svg>
+        </div>
+      </header>
 
-    <!-- Main Screen Body: Controls & Reader Grid -->
-    <main class="switch-screen-body">
-      <!-- Left Controls Panel -->
-      <aside class="switch-control-panel">
-        <!-- Tile 1: EML Dropzone -->
-        <div class="control-card">
-          <span class="control-heading">File Source</span>
-          <div class="switch-tile-dropzone" id="eml-dropzone">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <!-- 2. Main Switch Display Deck -->
+      <main class="switch-main-body">
+        <div class="switch-deck">
+          <!-- Left Controls -->
+          <aside class="switch-left-panel">
+            <!-- File EML Input -->
+            <div>
+              <div class="deck-section-title">Source File</div>
+              <div class="game-card-dropzone" id="eml-dropzone">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                </svg>
+                <p id="eml-drop-label">Select .eml Export</p>
+                <span>Click or drop file</span>
+                <input type="file" id="eml-file-input" class="file-input-hidden" accept=".eml,message/rfc822,text/plain">
+              </div>
+            </div>
+
+            <!-- Cover Image Input -->
+            <div>
+              <div class="deck-section-title">Book Cover</div>
+              <div class="game-card-dropzone" id="cover-dropzone">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                  <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                  <polyline points="21 15 16 10 5 21"></polyline>
+                </svg>
+                <p id="cover-drop-label">Optional Cover Image</p>
+                <span>PNG, JPG, or WEBP</span>
+                <input type="file" id="cover-file-input" class="file-input-hidden" accept="image/png,image/jpeg,image/webp">
+              </div>
+              <div id="cover-preview-container" class="cover-thumb-preview" style="display: none;">
+                <img id="cover-img-preview" alt="Cover">
+                <div>
+                  <span style="font-size: 0.78rem; font-weight: 600;">Cover attached</span><br>
+                  <button type="button" id="btn-remove-cover" class="btn-eject">Remove</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Interval Slider -->
+            <div>
+              <div class="slider-header-wrap">
+                <div class="deck-section-title">Break Frequency</div>
+                <span id="slider-interval-label" class="slider-teal-tag">Standard Breaks</span>
+              </div>
+              <input type="range" id="break-interval-slider" class="switch-range" min="0" max="100" value="50" step="1">
+              <div class="switch-range-ticks">
+                <span>Combined</span>
+                <span>Balanced</span>
+                <span>Every Note</span>
+              </div>
+            </div>
+
+            <!-- Divider Label Selector -->
+            <div class="switch-field-group">
+              <label for="divider-style-select">Divider Heading</label>
+              <select id="divider-style-select" class="switch-input">
+                <option value="Page">Page (Page 1, Page 2...)</option>
+                <option value="Chapter">Chapter (Chapter 1, Chapter 2...)</option>
+                <option value="Section">Section (Section 1, Section 2...)</option>
+                <option value="Part">Part (Part 1, Part 2...)</option>
+                <option value="custom">Custom Prefix...</option>
+                <option value="none">Nothing / Plain Line</option>
+              </select>
+            </div>
+            <div id="custom-divider-wrapper" class="switch-field-group" style="display: none;">
+              <label for="custom-divider-input">Custom Prefix</label>
+              <input type="text" id="custom-divider-input" class="switch-input" placeholder="e.g. Highlight">
+            </div>
+
+            <!-- Metadata Form -->
+            <div class="switch-field-group">
+              <label for="book-title-input">Book Title</label>
+              <input type="text" id="book-title-input" class="switch-input" placeholder="Title">
+            </div>
+            <div class="switch-field-group">
+              <label for="book-author-input">Author</label>
+              <input type="text" id="book-author-input" class="switch-input" placeholder="Author">
+            </div>
+            <div class="switch-field-group">
+              <label for="output-filename-input">Output Name</label>
+              <input type="text" id="output-filename-input" class="switch-input" placeholder="filename">
+            </div>
+          </aside>
+
+          <!-- Right Reader Paper Display -->
+          <section class="switch-book-viewport" id="book-paper">
+            <div id="empty-state" class="book-empty-state">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+              </svg>
+              <h3 style="font-size: 1.1rem; margin-top: 8px;">No Notes Card Inserted</h3>
+              <p style="font-size: 0.88rem; margin-top: 4px;">Upload an exported Apple Books .eml file on the left to begin.</p>
+            </div>
+
+            <div id="book-content" style="display: none;">
+              <div id="preview-cover-center" class="book-cover-container" style="display: none;">
+                <img id="preview-cover-element" alt="Cover">
+              </div>
+              <h1 id="preview-title" class="book-main-title"></h1>
+              <p id="preview-author" class="book-main-author"></p>
+              <hr class="book-divider-line">
+              <div id="preview-body-blocks"></div>
+            </div>
+          </section>
+        </div>
+
+        <!-- 3. Authentic Circular Bubble Action Tray -->
+        <div class="bubble-wrapper">
+          <div class="bubble disabled" id="btn-download-epub" data-option="Download EPUB">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            <div class="bubble-title"><span>Download EPUB</span></div>
+          </div>
+
+          <div class="bubble disabled" id="btn-download-pdf" data-option="Download PDF">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
               <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="12" y1="18" x2="12" y2="12"></line>
+              <line x1="9" y1="15" x2="15" y2="15"></line>
             </svg>
-            <p id="eml-drop-label" class="switch-tile-title">Insert .eml Export</p>
-            <span class="switch-tile-subtitle">Drag or Click to Select</span>
-            <input type="file" id="eml-file-input" class="file-input-hidden" accept=".eml,message/rfc822,text/plain">
+            <div class="bubble-title"><span>Download PDF</span></div>
           </div>
-        </div>
 
-        <!-- Tile 2: Cover Dropzone -->
-        <div class="control-card">
-          <span class="control-heading">Book Cover</span>
-          <div class="switch-tile-dropzone" id="cover-dropzone">
+          <div class="bubble" id="btn-reset" data-option="Reset Studio">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-              <circle cx="8.5" cy="8.5" r="1.5"></circle>
-              <polyline points="21 15 16 10 5 21"></polyline>
+              <polyline points="1 4 1 10 7 10"></polyline>
+              <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
             </svg>
-            <p id="cover-drop-label" class="switch-tile-title">Optional Cover Art</p>
-            <span class="switch-tile-subtitle">PNG, JPG, or WEBP</span>
-            <input type="file" id="cover-file-input" class="file-input-hidden" accept="image/png,image/jpeg,image/webp">
-          </div>
-          <div id="cover-preview-container" class="cover-preview-row" style="display: none;">
-            <img id="cover-img-preview" class="cover-thumb-img" alt="Cover">
-            <div>
-              <p style="font-size: 0.8rem; font-weight: 500;">Cover Attached</p>
-              <button type="button" id="btn-remove-cover" class="btn-remove-link">Eject Cover</button>
-            </div>
+            <div class="bubble-title"><span>Reset</span></div>
           </div>
         </div>
+      </main>
 
-        <!-- Tile 3: Paragraph Break Interval Slider -->
-        <div class="control-card">
-          <div class="slider-header">
-            <span class="control-heading">Interval Slider</span>
-            <span id="slider-interval-label" class="slider-tag">Standard Breaks</span>
-          </div>
-          <input type="range" id="break-interval-slider" class="switch-range-slider" min="0" max="100" value="50" step="1">
-          <div class="slider-sublabels">
-            <span>Combined</span>
-            <span>Balanced</span>
-            <span>Every Note</span>
-          </div>
-        </div>
-
-        <!-- Tile 4: Custom Page/Section/Chapter Divider Label Selector -->
-        <div class="control-card">
-          <span class="control-heading">Divider Style</span>
-          <div class="switch-input-group">
-            <select id="divider-style-select" class="switch-input-field">
-              <option value="Page">Page (Page 1, Page 2...)</option>
-              <option value="Chapter">Chapter (Chapter 1, Chapter 2...)</option>
-              <option value="Section">Section (Section 1, Section 2...)</option>
-              <option value="Part">Part (Part 1, Part 2...)</option>
-              <option value="custom">Custom Text...</option>
-              <option value="none">Nothing / Plain Line</option>
-            </select>
-          </div>
-          <div id="custom-divider-wrapper" class="switch-input-group" style="display: none; margin-top: 4px;">
-            <label for="custom-divider-input">Custom Prefix</label>
-            <input type="text" id="custom-divider-input" class="switch-input-field" placeholder="e.g. Note or Segment">
+      <!-- 4. Authentic Screen Footer with Controller Prompts -->
+      <footer class="screen-footer">
+        <div class="gamepad-icon">
+          <span>🎮</span>
+          <div class="gamepad-stats">
+            <span id="stat-annotations">0 highlights</span>
+            <span>&bull;</span>
+            <span id="stat-pages">0 pages</span>
+            <span>&bull;</span>
+            <span id="stat-words">0 words</span>
           </div>
         </div>
-
-        <!-- Tile 5: Metadata Inputs -->
-        <div class="control-card">
-          <span class="control-heading">Cartridge Details</span>
-          <div class="switch-input-group">
-            <label for="book-title-input">Title</label>
-            <input type="text" id="book-title-input" class="switch-input-field" placeholder="Book Title">
+        <div class="button-prompts">
+          <div class="options-prompt">
+            <span class="options-circle-btn">Y</span>
+            <span>Adjust Slider</span>
           </div>
-          <div class="switch-input-group">
-            <label for="book-author-input">Author</label>
-            <input type="text" id="book-author-input" class="switch-input-field" placeholder="Author">
-          </div>
-          <div class="switch-input-group">
-            <label for="output-filename-input">Output Name</label>
-            <input type="text" id="output-filename-input" class="switch-input-field" placeholder="filename">
+          <div class="options-prompt">
+            <span class="options-circle-btn">A</span>
+            <span>Select Action</span>
           </div>
         </div>
-      </aside>
-
-      <!-- Right Main Reader Screen -->
-      <section class="switch-reader-pane" id="book-paper">
-        <div id="empty-state" class="reader-empty-state">
-          <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-          </svg>
-          <p style="font-weight: 500; font-size: 1rem; margin-bottom: 4px;">No Game Card Inserted</p>
-          <span style="font-size: 0.85rem;">Insert an Apple Books .eml export file on the left.</span>
-        </div>
-
-        <div id="book-content" style="display: none;">
-          <div id="preview-cover-center" class="book-cover-wrap" style="display: none;">
-            <img id="preview-cover-element" alt="Book Cover">
-          </div>
-
-          <h1 id="preview-title" class="book-title"></h1>
-          <p id="preview-author" class="book-author"></p>
-          <hr class="book-rule">
-
-          <div id="preview-body-blocks"></div>
-        </div>
-      </section>
-    </main>
-
-    <!-- Switch OS Circular Action Tray -->
-    <div class="switch-bubble-tray">
-      <button class="switch-bubble disabled" id="btn-download-epub" title="Export EPUB for Apple Books">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-          <polyline points="7 10 12 15 17 10"></polyline>
-          <line x1="12" y1="15" x2="12" y2="3"></line>
-        </svg>
-        <span class="bubble-caption">EPUB</span>
-      </button>
-
-      <button class="switch-bubble disabled" id="btn-download-pdf" title="Export PDF Document">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-          <polyline points="14 2 14 8 20 8"></polyline>
-          <line x1="12" y1="18" x2="12" y2="12"></line>
-          <line x1="9" y1="15" x2="15" y2="15"></line>
-        </svg>
-        <span class="bubble-caption">PDF</span>
-      </button>
-
-      <button class="switch-bubble" id="btn-reset" title="Clear / Reset">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="1 4 1 10 7 10"></polyline>
-          <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
-        </svg>
-        <span class="bubble-caption">Reset</span>
-      </button>
+      </footer>
     </div>
-
-    <!-- Switch Footer Bar -->
-    <footer class="switch-footer">
-      <div class="switch-footer-stats">
-        <span id="stat-annotations">0 highlights</span>
-        <span>&bull;</span>
-        <span id="stat-pages">0 pages</span>
-        <span>&bull;</span>
-        <span id="stat-words">0 words</span>
-      </div>
-      <div class="switch-button-prompts">
-        <div><span class="switch-btn-badge">Y</span> Slider</div>
-        <div><span class="switch-btn-badge">A</span> Export</div>
-      </div>
-    </footer>
   </div>
+
+  <!-- Audio Elements from switchMenu-main -->
+  <audio id="audio" src="./sounds/Popup.wav"></audio>
+  <audio id="profileSound" src="./sounds/User.wav"></audio>
+  <audio id="klick" src="./sounds/Klick.wav"></audio>
+  <audio id="news" src="./sounds/News.wav"></audio>
+  <audio id="home-sound" src="./sounds/Home.wav"></audio>
 
   <script src="js/eml-parser.js"></script>
   <script src="js/epub-generator.js"></script>

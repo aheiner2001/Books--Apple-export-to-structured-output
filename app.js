@@ -1,10 +1,11 @@
 /**
  * Application Controller - Nintendo Switch Style UI
+ * Enhanced with authentic Switch sounds and interactive feedback
  */
 
 document.addEventListener('DOMContentLoaded', () => {
   // DOM References
-  const switchClock = document.getElementById('switch-clock');
+  const clock = document.getElementById('clock');
   const emlDropzone = document.getElementById('eml-dropzone');
   const emlFileInput = document.getElementById('eml-file-input');
   const emlDropLabel = document.getElementById('eml-drop-label');
@@ -42,25 +43,45 @@ document.addEventListener('DOMContentLoaded', () => {
   const previewAuthor = document.getElementById('preview-author');
   const previewBodyBlocks = document.getElementById('preview-body-blocks');
 
+  // Sounds from switchMenu-main
+  const klickSound = document.getElementById('klick');
+  const popupSound = document.getElementById('audio');
+  const profileSound = document.getElementById('profileSound');
+  const newsSound = document.getElementById('news');
+  const homeSound = document.getElementById('home-sound');
+
+  function playSound(audioEl) {
+    if (audioEl) {
+      audioEl.currentTime = 0;
+      audioEl.play().catch(() => {});
+    }
+  }
+
   // App State
   let currentParsedData = null;
-  let currentCoverData = null; // Data URL
+  let currentCoverData = null;
   let currentCoverMime = null;
   let structuredBlocks = [];
 
-  // Clock Update (Switch Status Bar)
+  // Authentic Switch Clock
   function updateClock() {
-    const now = new Date();
-    let hours = now.getHours();
-    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const d = new Date();
+    let m = d.getMinutes();
+    let hours = d.getHours();
     const ampm = hours >= 12 ? 'PM' : 'AM';
     hours = hours % 12 || 12;
-    if (switchClock) {
-      switchClock.textContent = `${hours}:${minutes} ${ampm}`;
+    if (clock) {
+      clock.textContent = `${hours}:${m < 10 ? '0' + m : m} ${ampm}`;
     }
   }
   updateClock();
   setInterval(updateClock, 1000);
+
+  // Profile avatar click
+  const profile = document.getElementById('profile');
+  if (profile) {
+    profile.addEventListener('click', () => playSound(profileSound));
+  }
 
   // Setup Dropzone
   function setupDropzone(dropzone, fileInput, onFileSelected) {
@@ -94,6 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
   setupDropzone(emlDropzone, emlFileInput, (file) => {
     emlDropLabel.textContent = file.name;
     emlDropzone.classList.add('is-loaded');
+    playSound(popupSound);
     const reader = new FileReader();
     reader.onload = (e) => {
       const content = e.target.result;
@@ -104,6 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Setup Cover Dropper
   setupDropzone(coverDropzone, coverFileInput, (file) => {
+    playSound(popupSound);
     const reader = new FileReader();
     reader.onload = (e) => {
       currentCoverData = e.target.result;
@@ -113,7 +136,8 @@ document.addEventListener('DOMContentLoaded', () => {
     reader.readAsDataURL(file);
   });
 
-  btnRemoveCover.addEventListener('click', () => {
+  btnRemoveCover.addEventListener('click', (e) => {
+    e.stopPropagation();
     currentCoverData = null;
     currentCoverMime = null;
     coverFileInput.value = '';
@@ -152,18 +176,20 @@ document.addEventListener('DOMContentLoaded', () => {
   breakIntervalSlider.addEventListener('input', (e) => {
     const val = parseInt(e.target.value, 10);
     updateSliderLabel(val);
+    playSound(klickSound);
     if (currentParsedData) {
       recalculateAndRender();
     }
   });
 
-  // Divider Style selection (Page, Chapter, Section, Custom, None)
+  // Divider Style selection
   dividerStyleSelect.addEventListener('change', () => {
     if (dividerStyleSelect.value === 'custom') {
       customDividerWrapper.style.display = 'flex';
     } else {
       customDividerWrapper.style.display = 'none';
     }
+    playSound(klickSound);
     renderLivePreview();
   });
 
@@ -227,6 +253,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // Enable Switch Action Bubbles
       btnDownloadEpub.classList.remove('disabled');
       btnDownloadPdf.classList.remove('disabled');
+      playSound(newsSound);
     } catch (err) {
       console.error('Error parsing EML:', err);
       alert('Could not parse this .eml file. Please verify it is a valid Apple Books export.');
@@ -247,7 +274,7 @@ document.addEventListener('DOMContentLoaded', () => {
     for (const block of structuredBlocks) {
       if (block.type === 'page-break') {
         const div = document.createElement('div');
-        div.className = 'book-page-marker';
+        div.className = 'book-divider-tag';
         const labelText = getDividerLabelText(block.pageNumber);
         if (labelText) {
           div.textContent = labelText;
@@ -258,12 +285,12 @@ document.addEventListener('DOMContentLoaded', () => {
         previewBodyBlocks.appendChild(div);
       } else if (block.type === 'prose') {
         const p = document.createElement('p');
-        p.className = 'book-prose';
+        p.className = 'book-body-p';
         p.textContent = block.content;
         previewBodyBlocks.appendChild(p);
       } else if (block.type === 'note') {
         const div = document.createElement('div');
-        div.className = 'book-note';
+        div.className = 'book-reflection-note';
         div.textContent = block.content;
         previewBodyBlocks.appendChild(div);
       }
@@ -278,13 +305,20 @@ document.addEventListener('DOMContentLoaded', () => {
     previewAuthor.textContent = authorInput.value ? `by ${authorInput.value}` : '';
   });
 
+  // Hover sound on bubbles
+  const bubbles = document.querySelectorAll('.bubble');
+  bubbles.forEach(b => {
+    b.addEventListener('mouseenter', () => playSound(klickSound));
+  });
+
   // Reset Button
   btnReset.addEventListener('click', () => {
+    playSound(homeSound);
     currentParsedData = null;
     currentCoverData = null;
     currentCoverMime = null;
     structuredBlocks = [];
-    emlDropLabel.textContent = 'Insert .eml Export';
+    emlDropLabel.textContent = 'Select .eml Export';
     emlDropzone.classList.remove('is-loaded');
     coverDropzone.classList.remove('is-loaded');
     coverPreviewContainer.style.display = 'none';
@@ -305,6 +339,7 @@ document.addEventListener('DOMContentLoaded', () => {
   btnDownloadEpub.addEventListener('click', async () => {
     if (!currentParsedData) return;
 
+    playSound(popupSound);
     btnDownloadEpub.classList.add('disabled');
 
     try {
@@ -339,6 +374,7 @@ document.addEventListener('DOMContentLoaded', () => {
   btnDownloadPdf.addEventListener('click', async () => {
     if (!currentParsedData) return;
 
+    playSound(popupSound);
     btnDownloadPdf.classList.add('disabled');
 
     try {
