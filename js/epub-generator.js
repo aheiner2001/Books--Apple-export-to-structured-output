@@ -14,15 +14,17 @@
 
   function escapeXml(unsafe) {
     if (!unsafe) return '';
-    return unsafe.replace(/[<>&'"]/g, function (c) {
-      switch (c) {
-        case '<': return '&lt;';
-        case '>': return '&gt;';
-        case '&': return '&amp;';
-        case '\'': return '&apos;';
-        case '"': return '&quot;';
-      }
-    });
+    return unsafe
+      .replace(/&nbsp;/g, '&#160;')
+      .replace(/[<>&'"]/g, function (c) {
+        switch (c) {
+          case '<': return '&lt;';
+          case '>': return '&gt;';
+          case '&': return '&amp;';
+          case '\'': return '&apos;';
+          case '"': return '&quot;';
+        }
+      });
   }
 
   function generateUuid() {
@@ -174,7 +176,7 @@ p.prose-paragraph {
       if (block.type === 'page-break') {
         if (block.pageNumber > 1) {
           if (dividerLabel === 'none') {
-            bodyHtml += `<div class="page-marker" style="font-size:0;">&nbsp;</div>\n`;
+            bodyHtml += `<div class="page-marker" style="font-size:0;">&#160;</div>\n`;
           } else {
             const prefix = dividerLabel === 'custom' ? (options.customDividerText || '') : (dividerLabel || 'Page');
             const text = prefix ? `${prefix} ${block.pageNumber}` : `${block.pageNumber}`;
