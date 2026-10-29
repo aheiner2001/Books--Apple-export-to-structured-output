@@ -190,7 +190,7 @@ p.prose-paragraph {
       }
     }
 
-    const chapterHtml = `<?xml version="1.0" encoding="utf-8"?>
+    let chapterHtml = `<?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
 <head>
@@ -201,6 +201,8 @@ p.prose-paragraph {
 ${bodyHtml}
 </body>
 </html>`;
+    // Aggressively replace all HTML entities that are invalid in strict XHTML/XML (like &nbsp;)
+    chapterHtml = chapterHtml.replace(/&nbsp;/g, '&#160;');
     zip.file('OEBPS/chapter1.xhtml', chapterHtml);
 
     // 6. Navigation Document
