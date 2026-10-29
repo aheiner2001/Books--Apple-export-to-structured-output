@@ -15,6 +15,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const coverImgPreview = document.getElementById('cover-img-preview');
   const btnRemoveCover = document.getElementById('btn-remove-cover');
 
+  const breakIntervalSlider = document.getElementById('break-interval-slider');
+  const sliderIntervalLabel = document.getElementById('slider-interval-label');
+
   const titleInput = document.getElementById('book-title-input');
   const authorInput = document.getElementById('book-author-input');
   const filenameInput = document.getElementById('output-filename-input');
@@ -114,6 +117,49 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ============================
+  // Slider / Interval Controls
+  // ============================
+
+  function updateSliderLabel(val) {
+    if (val >= 95) {
+      sliderIntervalLabel.textContent = 'Every Note Separated';
+    } else if (val >= 65) {
+      sliderIntervalLabel.textContent = 'Frequent Breaks';
+    } else if (val >= 35) {
+      sliderIntervalLabel.textContent = 'Balanced Breaks';
+    } else if (val > 5) {
+      sliderIntervalLabel.textContent = 'Fewer Breaks';
+    } else {
+      sliderIntervalLabel.textContent = 'Maximum Combined';
+    }
+  }
+
+  breakIntervalSlider.addEventListener('input', (e) => {
+    const val = parseInt(e.target.value, 10);
+    updateSliderLabel(val);
+    if (currentParsedData) {
+      recalculateAndRender();
+    }
+  });
+
+  function recalculateAndRender() {
+    if (!currentParsedData) return;
+
+    const breakFrequency = parseInt(breakIntervalSlider.value, 10);
+
+    // Re-stitch using user-controlled break frequency
+    structuredBlocks = window.EMLParser.stitchContinuousProse(currentParsedData.annotations, {
+      breakFrequency: breakFrequency,
+      wordsPerPage: 350
+    });
+
+    const totalPages = structuredBlocks.filter(b => b.type === 'page-break').length || 1;
+    statPages.textContent = `${totalPages} pages`;
+
+    renderLivePreview();
+  }
+
+  // ============================
   // EML Processing & Rendering
   // ============================
 
@@ -122,7 +168,6 @@ document.addEventListener('DOMContentLoaded', () => {
       const parsed = window.EMLParser.parseEmlNotes(rawEml);
       currentParsedData = parsed;
 
-      // Clean default filename
       const safeTitle = (parsed.title || 'book-notes')
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, '-')
@@ -132,29 +177,17 @@ document.addEventListener('DOMContentLoaded', () => {
       authorInput.value = parsed.author || '';
       filenameInput.value = safeTitle || 'notes';
 
-      // Stitch highlights and notes into even paragraphs and pages
-      structuredBlocks = window.EMLParser.stitchContinuousProse(parsed.annotations, {
-        wordsPerParagraph: 110,
-        wordsPerPage: 350
-      });
-
-      // Calculate stats
       const totalWords = parsed.annotations.reduce((acc, curr) => {
         const words = (curr.text + ' ' + curr.note).trim().split(/\s+/).filter(Boolean).length;
         return acc + words;
       }, 0);
 
-      const totalPages = structuredBlocks.filter(b => b.type === 'page-break').length || 1;
-
       statAnnotations.textContent = `${parsed.annotations.length} highlights`;
-      statPages.textContent = `${totalPages} pages`;
       statWords.textContent = `${totalWords.toLocaleString()} words`;
       statsBox.style.display = 'flex';
 
-      // Update Live Preview
-      renderLivePreview();
+      recalculateAndRender();
 
-      // Enable export buttons
       btnDownloadEpub.disabled = false;
       btnDownloadPdf.disabled = false;
     } catch (err) {

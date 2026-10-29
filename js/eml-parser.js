@@ -205,7 +205,6 @@
   function splitIntoParagraphs(text, targetWords = 110) {
     if (!text) return [];
 
-    // Split text into sentences
     const sentences = text.match(/[^.!?]+[.!?]+(\s+|$)|[^.!?]+$/g) || [text];
     const paragraphs = [];
     let current = [];
@@ -234,44 +233,93 @@
   }
 
   /**
-   * Stitches annotations into balanced paragraphs and pages.
-   * - Breaks text into balanced paragraphs (~100-130 words)
-   * - Inserts page breaks and page numbers (~320-380 words per page)
-   * - Formats user notes as distinct reflection blocks
+   * Stitches annotations into paragraphs and pages based on slider value (0 to 100):
+   * - At slider = 100 (Max Right): Every single note/highlight is separated into its own paragraph.
+   * - At slider = 0 (Max Left): Highlights are maximally combined into continuous long prose.
+   * - In between: Balanced paragraphs scaled smoothly between ~400 words (fewest breaks) to 40 words (frequent breaks).
    */
   function stitchContinuousProse(annotations, options = {}) {
     if (!annotations || annotations.length === 0) return [];
 
-    const targetWordsPerParagraph = options.wordsPerParagraph || 115;
+    // sliderValue: 0 (most combined) to 100 (each highlight separate)
+    const breakFrequency = typeof options.breakFrequency === 'number' ? options.breakFrequency : 50;
     const targetWordsPerPage = options.wordsPerPage || 350;
 
     const rawBlocks = [];
 
-    // Phase 1: Build paragraphs and notes
-    for (const ann of annotations) {
-      if (ann.text) {
-        const paragraphs = splitIntoParagraphs(ann.text, targetWordsPerParagraph);
-        for (const p of paragraphs) {
+    if (breakFrequency >= 100) {
+      // Maximum breaks: Every single annotation gets its own paragraph
+      for (const ann of annotations) {
+        if (ann.text) {
+          rawBlocks.push({ type: 'prose', content: ann.text });
+        }
+        if (ann.note) {
+          rawBlocks.push({ type: 'note', content: ann.note });
+        }
+      }
+    } else {
+      // Calculate target words per paragraph smoothly:
+      // slider 0 -> 450 words (almost no internal breaks, continuous text)
+      // slider 50 -> ~115 words (normal standard book paragraph)
+      // slider 99 -> ~40 words (frequent paragraph breaks)
+      const targetWords = Math.round(450 - (breakFrequency / 100) * 410);
+
+      let currentContinuousText = [];
+      let currentWordCount = 0;
+
+      for (const ann of annotations) {
+        if (ann.text) {
+          const annWords = ann.text.split(/\s+/).length;
+          currentContinuousText.push(ann.text);
+          currentWordCount += annWords;
+
+          // If reached target size, break into paragraph
+          if (currentWordCount >= targetWords) {
+            const combined = currentContinuousText.join(' ');
+            const paras = splitIntoParagraphs(combined, targetWords);
+            for (const p of paras) {
+              rawBlocks.push({ type: 'prose', content: p });
+            }
+            currentContinuousText = [];
+            currentWordCount = 0;
+          }
+        }
+
+        if (ann.note) {
+          // Flush any pending text before the note
+          if (currentContinuousText.length > 0) {
+            const combined = currentContinuousText.join(' ');
+            const paras = splitIntoParagraphs(combined, targetWords);
+            for (const p of paras) {
+              rawBlocks.push({ type: 'prose', content: p });
+            }
+            currentContinuousText = [];
+            currentWordCount = 0;
+          }
+          rawBlocks.push({ type: 'note', content: ann.note });
+        }
+      }
+
+      // Flush remaining text
+      if (currentContinuousText.length > 0) {
+        const combined = currentContinuousText.join(' ');
+        const paras = splitIntoParagraphs(combined, targetWords);
+        for (const p of paras) {
           rawBlocks.push({ type: 'prose', content: p });
         }
       }
-      if (ann.note) {
-        rawBlocks.push({ type: 'note', content: ann.note });
-      }
     }
 
-    // Phase 2: Insert page markers at regular intervals
+    // Phase 2: Insert page break markers
     const structuredItems = [];
     let pageNumber = 1;
     let accumulatedWordsOnPage = 0;
 
-    // Start with Page 1 header marker
     structuredItems.push({ type: 'page-break', pageNumber: pageNumber });
 
     for (const block of rawBlocks) {
       const words = block.content.split(/\s+/).length;
 
-      // If adding this block exceeds page target, trigger next page
       if (accumulatedWordsOnPage > 0 && (accumulatedWordsOnPage + words) > targetWordsPerPage) {
         pageNumber++;
         structuredItems.push({ type: 'page-break', pageNumber: pageNumber });
