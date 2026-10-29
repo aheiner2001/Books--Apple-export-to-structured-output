@@ -1,0 +1,28 @@
+{
+  "name": "books--apple-export-to-structured-output",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aheiner2001/Books--Apple-export-to-structured-output.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/aheiner2001/Books--Apple-export-to-structured-output/issues"
+  },
+  "homepage": "https://github.com/aheiner2001/Books--Apple-export-to-structured-output#readme",
+  "dependencies": {
+    "jszip": "^3.10.2"
+  }
+}
