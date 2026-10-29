@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const statsBox = document.getElementById('stats-box');
   const statAnnotations = document.getElementById('stat-annotations');
+  const statPages = document.getElementById('stat-pages');
   const statWords = document.getElementById('stat-words');
 
   const btnDownloadEpub = document.getElementById('btn-download-epub');
@@ -38,7 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentParsedData = null;
   let currentCoverData = null; // Data URL
   let currentCoverMime = null;
-  let stitchedBlocks = [];
+  let structuredBlocks = [];
 
   // ============================
   // File Drop / Selection Handlers
@@ -131,8 +132,11 @@ document.addEventListener('DOMContentLoaded', () => {
       authorInput.value = parsed.author || '';
       filenameInput.value = safeTitle || 'notes';
 
-      // Stitch highlights and notes into continuous prose
-      stitchedBlocks = window.EMLParser.stitchContinuousProse(parsed.annotations);
+      // Stitch highlights and notes into even paragraphs and pages
+      structuredBlocks = window.EMLParser.stitchContinuousProse(parsed.annotations, {
+        wordsPerParagraph: 110,
+        wordsPerPage: 350
+      });
 
       // Calculate stats
       const totalWords = parsed.annotations.reduce((acc, curr) => {
@@ -140,7 +144,10 @@ document.addEventListener('DOMContentLoaded', () => {
         return acc + words;
       }, 0);
 
+      const totalPages = structuredBlocks.filter(b => b.type === 'page-break').length || 1;
+
       statAnnotations.textContent = `${parsed.annotations.length} highlights`;
+      statPages.textContent = `${totalPages} pages`;
       statWords.textContent = `${totalWords.toLocaleString()} words`;
       statsBox.style.display = 'flex';
 
@@ -167,8 +174,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     previewBodyBlocks.innerHTML = '';
 
-    for (const block of stitchedBlocks) {
-      if (block.type === 'prose') {
+    for (const block of structuredBlocks) {
+      if (block.type === 'page-break') {
+        const div = document.createElement('div');
+        div.className = 'page-marker-ui';
+        div.textContent = `Page ${block.pageNumber}`;
+        previewBodyBlocks.appendChild(div);
+      } else if (block.type === 'prose') {
         const p = document.createElement('p');
         p.className = 'book-prose-p';
         p.textContent = block.content;
@@ -182,7 +194,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Live update preview when title or author changes
   titleInput.addEventListener('input', () => {
     previewTitle.textContent = titleInput.value || 'Untitled Notes';
   });
@@ -201,13 +212,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     btnDownloadEpub.disabled = true;
     const originalText = btnDownloadEpub.innerHTML;
-    btnDownloadEpub.innerHTML = '<span>⏳</span> Generating EPUB...';
+    btnDownloadEpub.innerHTML = '<span>Generating EPUB...</span>';
 
     try {
       const blob = await window.EPUBGenerator.generateEpub({
         title: titleInput.value || 'Untitled Notes',
         author: authorInput.value || 'Unknown',
-        blocks: stitchedBlocks,
+        blocks: structuredBlocks,
         coverData: currentCoverData,
         coverMime: currentCoverMime
       });
@@ -236,7 +247,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     btnDownloadPdf.disabled = true;
     const originalText = btnDownloadPdf.innerHTML;
-    btnDownloadPdf.innerHTML = '<span>⏳</span> Generating PDF...';
+    btnDownloadPdf.innerHTML = '<span>Generating PDF...</span>';
 
     try {
       const filename = (filenameInput.value || 'book-notes').replace(/\.pdf$/i, '') + '.pdf';

@@ -5,15 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Apple Books Notes Converter</title>
   <link rel="stylesheet" href="style.css">
-  <!-- External dependencies for in-browser client-side EPUB and PDF generation -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
   <div class="container">
     <header>
-      <h1>Apple Books Notes Converter</h1>
-      <p>Transform your exported Apple Books notes into clean, continuous EPUB and PDF books.</p>
+      <h1>Notes Converter</h1>
+      <p>Transform Apple Books exports into continuous EPUB and PDF books.</p>
     </header>
 
     <div class="main-layout">
@@ -21,79 +20,106 @@
       <aside class="controls-card">
         <!-- Step 1: Upload EML -->
         <div class="section-block">
-          <h2 class="section-title">1. Upload Apple Books Export</h2>
+          <h2 class="section-title">Apple Books Export</h2>
           <div class="dropzone" id="eml-dropzone">
-            <span class="icon">📖</span>
-            <p id="eml-drop-label">Choose or drop .eml file here</p>
-            <span class="sub-text">From Apple Books Export Email</span>
+            <!-- Simple clean SVG file icon -->
+            <svg class="icon-svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+            <p id="eml-drop-label">Choose or drop .eml file</p>
+            <span class="sub-text">Exported from Apple Books</span>
             <input type="file" id="eml-file-input" class="file-input" accept=".eml,message/rfc822,text/plain">
           </div>
         </div>
 
         <!-- Step 2: Custom Cover -->
         <div class="section-block">
-          <h2 class="section-title">2. Book Cover (Optional)</h2>
+          <h2 class="section-title">Cover Image (Optional)</h2>
           <div class="dropzone" id="cover-dropzone">
-            <span class="icon">🖼️</span>
-            <p id="cover-drop-label">Choose or drop book cover</p>
+            <!-- Simple clean SVG image icon -->
+            <svg class="icon-svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <circle cx="8.5" cy="8.5" r="1.5"></circle>
+              <polyline points="21 15 16 10 5 21"></polyline>
+            </svg>
+            <p id="cover-drop-label">Choose or drop cover</p>
             <span class="sub-text">PNG, JPG, or WEBP</span>
             <input type="file" id="cover-file-input" class="file-input" accept="image/png,image/jpeg,image/webp">
           </div>
           <div id="cover-preview-container" class="cover-preview-wrapper" style="display: none; margin-top: 10px;">
             <img id="cover-img-preview" class="cover-thumbnail" alt="Cover Preview">
             <div>
-              <p style="font-size: 0.85rem; font-weight: 600;">Custom Cover Loaded</p>
-              <button type="button" id="btn-remove-cover" class="btn-remove-cover">Remove Cover</button>
+              <p style="font-size: 0.85rem; font-weight: 500;">Cover attached</p>
+              <button type="button" id="btn-remove-cover" class="btn-remove-cover">Remove</button>
             </div>
           </div>
         </div>
 
         <!-- Step 3: Book Details -->
         <div class="section-block">
-          <h2 class="section-title">3. Book Information</h2>
+          <h2 class="section-title">Metadata</h2>
           <div class="form-group">
-            <label for="book-title-input">Book Title</label>
-            <input type="text" id="book-title-input" class="form-control" placeholder="Extracted Title">
+            <label for="book-title-input">Title</label>
+            <input type="text" id="book-title-input" class="form-control" placeholder="Book Title">
           </div>
-          <div class="form-group" style="margin-top: 12px;">
+          <div class="form-group">
             <label for="book-author-input">Author</label>
-            <input type="text" id="book-author-input" class="form-control" placeholder="Extracted Author">
+            <input type="text" id="book-author-input" class="form-control" placeholder="Author Name">
           </div>
-          <div class="form-group" style="margin-top: 12px;">
-            <label for="output-filename-input">Output Filename</label>
-            <input type="text" id="output-filename-input" class="form-control" placeholder="book-notes">
+          <div class="form-group">
+            <label for="output-filename-input">Output Name</label>
+            <input type="text" id="output-filename-input" class="form-control" placeholder="filename">
           </div>
         </div>
 
         <!-- Stats -->
         <div id="stats-box" class="stats-badge" style="display: none;">
           <span id="stat-annotations">0 highlights</span>
+          <span id="stat-pages">0 pages</span>
           <span id="stat-words">0 words</span>
         </div>
 
         <!-- Step 4: Export Buttons -->
         <div class="btn-group">
           <button id="btn-download-epub" class="btn btn-primary" disabled>
-            <span>📱</span> Download EPUB (Apple Books)
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            Download EPUB
           </button>
           <button id="btn-download-pdf" class="btn btn-secondary" disabled>
-            <span>📄</span> Download PDF
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="12" y1="18" x2="12" y2="12"></line>
+              <line x1="9" y1="15" x2="15" y2="15"></line>
+            </svg>
+            Download PDF
           </button>
         </div>
       </aside>
 
-      <!-- Right column: Live Book Preview -->
+      <!-- Right column: Minimal Live Reader Preview -->
       <main class="preview-card">
         <div class="preview-header">
-          <h2>Continuous Reader Preview</h2>
-          <span class="preview-tag">Dates Stripped &bull; Chronological Order</span>
+          <h2>Reader Preview</h2>
+          <span class="preview-tag">Even Paragraphs &bull; Sequential Pages</span>
         </div>
 
         <div id="book-paper" class="book-paper">
           <div id="empty-state" class="empty-state">
-            <span class="icon">📚</span>
-            <h3>No file uploaded yet</h3>
-            <p>Upload an Apple Books exported .eml file on the left to see the continuous book preview here.</p>
+            <svg class="icon-svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+            </svg>
+            <h3>No file loaded</h3>
+            <p>Upload an Apple Books exported .eml file to format and preview.</p>
           </div>
 
           <div id="book-content" style="display: none;">
@@ -107,7 +133,7 @@
             <p id="preview-author" class="book-author-sub"></p>
             <hr class="book-divider">
 
-            <!-- Continuous body paragraphs and styled notes -->
+            <!-- Body Paragraphs & Page Break Markers -->
             <div id="preview-body-blocks"></div>
           </div>
         </div>
@@ -115,7 +141,6 @@
     </div>
   </div>
 
-  <!-- Internal Application Modules -->
   <script src="js/eml-parser.js"></script>
   <script src="js/epub-generator.js"></script>
   <script src="js/pdf-generator.js"></script>

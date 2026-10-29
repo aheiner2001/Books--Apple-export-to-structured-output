@@ -35,13 +35,6 @@
 
   /**
    * Generates a valid EPUB 3 zip buffer or blob
-   * @param {Object} options
-   * @param {string} options.title
-   * @param {string} options.author
-   * @param {Array<{type: 'prose'|'note', content: string}>} options.blocks
-   * @param {string|Uint8Array} [options.coverData] - Base64 or byte array
-   * @param {string} [options.coverMime] - e.g. 'image/jpeg' or 'image/png'
-   * @returns {Promise<Blob|Buffer>}
    */
   async function generateEpub(options) {
     if (!JSZip) {
@@ -58,7 +51,7 @@
 
     const zip = new JSZip();
 
-    // 1. mimetype file: MUST be first, uncompressed
+    // 1. mimetype file: uncompressed
     zip.file('mimetype', 'application/epub+zip', { compression: 'STORE' });
 
     // 2. META-INF/container.xml
@@ -70,52 +63,67 @@
 </container>`;
     zip.file('META-INF/container.xml', containerXml);
 
-    // 3. OEBPS/style.css
+    // 3. OEBPS/style.css - Minimalist, modern typography
     const bookCss = `body {
-  font-family: Georgia, Palatino, "Times New Roman", serif;
-  line-height: 1.6;
-  margin: 5% 8%;
-  color: #111;
+  font-family: Georgia, -apple-system, BlinkMacSystemFont, "Times New Roman", serif;
+  line-height: 1.7;
+  margin: 6% 8%;
+  color: #1a1a1a;
+  background: #ffffff;
 }
 h1.book-title {
   text-align: center;
-  font-size: 2em;
-  margin-top: 1.5em;
-  margin-bottom: 0.3em;
+  font-size: 2.1em;
+  font-weight: 600;
+  margin-top: 1.6em;
+  margin-bottom: 0.25em;
+  letter-spacing: -0.01em;
 }
 p.book-author {
   text-align: center;
-  font-size: 1.2em;
-  font-style: italic;
-  color: #555;
-  margin-bottom: 2.5em;
+  font-size: 1.15em;
+  color: #666;
+  margin-bottom: 2em;
 }
 hr.divider {
   border: 0;
   height: 1px;
-  background: #ccc;
-  margin: 2em auto;
-  width: 50%;
+  background: #eaeaea;
+  margin: 2.5em auto;
+  width: 40%;
+}
+.page-marker {
+  text-align: center;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 0.75em;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #999;
+  margin: 3.5em 0 2em;
+  padding-top: 1.5em;
+  border-top: 1px dashed #eaeaea;
+  page-break-before: always;
 }
 p.prose-paragraph {
   text-align: justify;
   text-indent: 1.5em;
-  margin: 0 0 0.8em 0;
+  margin: 0 0 1.1em 0;
 }
 .user-note {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  background: #f8f9fa;
-  border-left: 4px solid #007aff;
-  padding: 12px 16px;
-  margin: 1.5em 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #fafafa;
+  border-left: 3px solid #1a1a1a;
+  padding: 12px 18px;
+  margin: 1.6em 0;
   font-style: italic;
+  font-size: 0.95em;
   color: #333;
 }
 .user-note::before {
   content: "Note: ";
-  font-weight: bold;
+  font-weight: 600;
   font-style: normal;
-  color: #007aff;
+  color: #1a1a1a;
 }
 .cover-img {
   max-width: 100%;
@@ -139,7 +147,6 @@ p.prose-paragraph {
         zip.file(`OEBPS/cover.${coverExt}`, rawData);
       }
 
-      // cover.xhtml
       const coverHtml = `<?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
@@ -157,13 +164,17 @@ p.prose-paragraph {
       zip.file('OEBPS/cover.xhtml', coverHtml);
     }
 
-    // 5. OEBPS/chapter1.xhtml (Continuous reading content)
+    // 5. OEBPS/chapter1.xhtml
     let bodyHtml = `<h1 class="book-title">${escapeXml(title)}</h1>\n`;
-    bodyHtml += `<p class="book-author">${escapeXml(author)}</p>\n`;
+    bodyHtml += `<p class="book-author">${escapeXml(author ? `by ${author}` : '')}</p>\n`;
     bodyHtml += `<hr class="divider"/>\n`;
 
     for (const block of blocks) {
-      if (block.type === 'prose') {
+      if (block.type === 'page-break') {
+        if (block.pageNumber > 1) {
+          bodyHtml += `<div class="page-marker">Page ${block.pageNumber}</div>\n`;
+        }
+      } else if (block.type === 'prose') {
         bodyHtml += `<p class="prose-paragraph">${escapeXml(block.content)}</p>\n`;
       } else if (block.type === 'note') {
         bodyHtml += `<div class="user-note">${escapeXml(block.content)}</div>\n`;
@@ -183,7 +194,7 @@ ${bodyHtml}
 </html>`;
     zip.file('OEBPS/chapter1.xhtml', chapterHtml);
 
-    // 6. Navigation Document: OEBPS/nav.xhtml
+    // 6. Navigation Document
     const navHtml = `<?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
@@ -202,7 +213,7 @@ ${bodyHtml}
 </html>`;
     zip.file('OEBPS/nav.xhtml', navHtml);
 
-    // 7. NCX for backwards compatibility: OEBPS/toc.ncx
+    // 7. NCX
     const ncxXml = `<?xml version="1.0" encoding="UTF-8"?>
 <ncx xmlns="http://www.daisy.org/z3986/2005/ncx/" version="2005-1">
   <head>
@@ -249,7 +260,6 @@ ${bodyHtml}
 </package>`;
     zip.file('OEBPS/content.opf', opfXml);
 
-    // Generate output
     if (typeof window !== 'undefined') {
       return await zip.generateAsync({ type: 'blob', mimeType: 'application/epub+zip' });
     } else {

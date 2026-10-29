@@ -41,7 +41,6 @@
           return Buffer.from(bytes).toString('utf-8');
         }
       } catch (e) {
-        // Fallback to Latin-1
         return bytes.map(b => String.fromCharCode(b)).join('');
       }
       return match;
@@ -54,7 +53,6 @@
   function extractHtmlFromEml(emlText) {
     if (!emlText) return '';
 
-    // Check if there is a boundary
     const boundaryMatch = emlText.match(/boundary=["']?([^"';\r\n]+)["']?/i);
     if (boundaryMatch) {
       const boundary = boundaryMatch[1];
@@ -62,7 +60,6 @@
 
       for (const part of parts) {
         if (/Content-Type:\s*text\/html/i.test(part)) {
-          // Find blank line separating headers from body
           const bodyIndex = part.search(/\r?\n\r?\n/);
           if (bodyIndex !== -1) {
             return part.slice(bodyIndex).trim();
@@ -71,7 +68,6 @@
       }
     }
 
-    // Fallback: If no boundary found or no text/html found, check if whole or part contains html
     const htmlStart = emlText.indexOf('<html');
     if (htmlStart !== -1) {
       return emlText.slice(htmlStart);
@@ -80,9 +76,6 @@
     return emlText;
   }
 
-  /**
-   * Helper to clean whitespace in extracted text
-   */
   function cleanText(str) {
     if (!str) return '';
     return str
@@ -99,23 +92,19 @@
     let author = '';
     const rawAnnotations = [];
 
-    // Check if in browser or node
     let doc;
     if (typeof DOMParser !== 'undefined') {
       const parser = new DOMParser();
       doc = parser.parseFromString(htmlString, 'text/html');
     } else {
-      // Node.js fallback using light regex DOM parsing for tests
       return parseAnnotationsWithRegex(htmlString);
     }
 
-    // Extract Title
     const titleEl = doc.querySelector('.booktitle');
     if (titleEl) {
       title = cleanText(titleEl.textContent);
     }
 
-    // Extract Author
     const h2Elements = doc.querySelectorAll('h2');
     for (const h2 of h2Elements) {
       const text = cleanText(h2.textContent);
@@ -125,7 +114,6 @@
       }
     }
 
-    // Extract Annotations
     const annotationEls = doc.querySelectorAll('.annotation');
     annotationEls.forEach(el => {
       const textEl = el.querySelector('.annotationrepresentativetext');
@@ -145,57 +133,43 @@
       }
     });
 
-    // Apple Books exports annotations ordered from most recent highlight to earliest.
-    // To match book chronological order (from start to finish of the book),
-    // reverse the annotations array.
-    const chronologicalAnnotations = rawAnnotations.reverse();
-
     return {
       title,
       author,
-      annotations: chronologicalAnnotations
+      annotations: rawAnnotations.reverse()
     };
   }
 
-  /**
-   * Regex-based parsing fallback for Node.js test environment without jsdom
-   */
   function parseAnnotationsWithRegex(htmlString) {
     let title = '';
     let author = '';
     const rawAnnotations = [];
 
-    // Title: <h1 class="booktitle"[^>]*>([\s\S]*?)<\/h1>
     const titleMatch = htmlString.match(/<h1[^>]*class=["'][^"']*booktitle[^"']*["'][^>]*>([\s\S]*?)<\/h1>/i);
     if (titleMatch) {
       title = cleanText(titleMatch[1].replace(/<[^>]+>/g, ''));
     }
 
-    // Author: <h2[^>]*>([\s\S]*?)<\/h2>
     const authorMatch = htmlString.match(/<h2[^>]*>([\s\S]*?)<\/h2>/i);
     if (authorMatch) {
       author = cleanText(authorMatch[1].replace(/<[^>]+>/g, ''));
     }
 
-    // Match each <div class="annotation">...</div>
     const annotationBlocks = htmlString.split(/<div[^>]*class=["'][^"']*annotation["'][^>]*>/i);
     for (let i = 1; i < annotationBlocks.length; i++) {
       const block = annotationBlocks[i];
-      // Extract highlight text
       let text = '';
       const textMatch = block.match(/<p[^>]*class=["'][^"']*annotationrepresentativetext[^"']*["'][^>]*>([\s\S]*?)<\/p>/i);
       if (textMatch) {
         text = cleanText(textMatch[1].replace(/<[^>]+>/g, ''));
       }
 
-      // Extract note
       let note = '';
       const noteMatch = block.match(/<p[^>]*class=["'][^"']*annotationnote[^"']*["'][^>]*>([\s\S]*?)<\/p>/i);
       if (noteMatch) {
         note = cleanText(noteMatch[1].replace(/<[^>]+>/g, ''));
       }
 
-      // Extract chapter
       let chapter = '';
       const chapMatch = block.match(/<div[^>]*class=["'][^"']*annotationchapter[^"']*["'][^>]*>([\s\S]*?)<\/div>/i);
       if (chapMatch) {
@@ -218,9 +192,6 @@
     };
   }
 
-  /**
-   * Main function: Parses an Apple Books .eml file string
-   */
   function parseEmlNotes(emlText) {
     const rawHtml = extractHtmlFromEml(emlText);
     const decodedHtml = decodeQuotedPrintable(rawHtml);
@@ -228,32 +199,90 @@
   }
 
   /**
-   * Stitches annotations into continuous prose blocks and notes
+   * Helper: Splits long text into evenly-sized paragraphs (approx targetWords)
+   * while preserving natural sentence boundaries (. ! ?)
    */
-  function stitchContinuousProse(annotations) {
+  function splitIntoParagraphs(text, targetWords = 110) {
+    if (!text) return [];
+
+    // Split text into sentences
+    const sentences = text.match(/[^.!?]+[.!?]+(\s+|$)|[^.!?]+$/g) || [text];
+    const paragraphs = [];
+    let current = [];
+    let currentCount = 0;
+
+    for (const sent of sentences) {
+      const trimmed = sent.trim();
+      if (!trimmed) continue;
+      const count = trimmed.split(/\s+/).length;
+
+      if (currentCount > 0 && (currentCount + count) > targetWords) {
+        paragraphs.push(current.join(' '));
+        current = [trimmed];
+        currentCount = count;
+      } else {
+        current.push(trimmed);
+        currentCount += count;
+      }
+    }
+
+    if (current.length > 0) {
+      paragraphs.push(current.join(' '));
+    }
+
+    return paragraphs;
+  }
+
+  /**
+   * Stitches annotations into balanced paragraphs and pages.
+   * - Breaks text into balanced paragraphs (~100-130 words)
+   * - Inserts page breaks and page numbers (~320-380 words per page)
+   * - Formats user notes as distinct reflection blocks
+   */
+  function stitchContinuousProse(annotations, options = {}) {
     if (!annotations || annotations.length === 0) return [];
 
-    const blocks = [];
-    let currentParagraphs = [];
+    const targetWordsPerParagraph = options.wordsPerParagraph || 115;
+    const targetWordsPerPage = options.wordsPerPage || 350;
 
+    const rawBlocks = [];
+
+    // Phase 1: Build paragraphs and notes
     for (const ann of annotations) {
       if (ann.text) {
-        currentParagraphs.push(ann.text);
+        const paragraphs = splitIntoParagraphs(ann.text, targetWordsPerParagraph);
+        for (const p of paragraphs) {
+          rawBlocks.push({ type: 'prose', content: p });
+        }
       }
       if (ann.note) {
-        if (currentParagraphs.length > 0) {
-          blocks.push({ type: 'prose', content: currentParagraphs.join(' ') });
-          currentParagraphs = [];
-        }
-        blocks.push({ type: 'note', content: ann.note });
+        rawBlocks.push({ type: 'note', content: ann.note });
       }
     }
 
-    if (currentParagraphs.length > 0) {
-      blocks.push({ type: 'prose', content: currentParagraphs.join(' ') });
+    // Phase 2: Insert page markers at regular intervals
+    const structuredItems = [];
+    let pageNumber = 1;
+    let accumulatedWordsOnPage = 0;
+
+    // Start with Page 1 header marker
+    structuredItems.push({ type: 'page-break', pageNumber: pageNumber });
+
+    for (const block of rawBlocks) {
+      const words = block.content.split(/\s+/).length;
+
+      // If adding this block exceeds page target, trigger next page
+      if (accumulatedWordsOnPage > 0 && (accumulatedWordsOnPage + words) > targetWordsPerPage) {
+        pageNumber++;
+        structuredItems.push({ type: 'page-break', pageNumber: pageNumber });
+        accumulatedWordsOnPage = 0;
+      }
+
+      structuredItems.push(block);
+      accumulatedWordsOnPage += words;
     }
 
-    return blocks;
+    return structuredItems;
   }
 
   return {
@@ -261,6 +290,7 @@
     extractHtmlFromEml,
     parseHtmlAnnotations,
     parseEmlNotes,
+    splitIntoParagraphs,
     stitchContinuousProse
   };
 });
