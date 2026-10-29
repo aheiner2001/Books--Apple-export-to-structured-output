@@ -1,10 +1,10 @@
 /**
- * Application Controller
- * Handles UI interactions, file drops, live preview rendering, and export triggers
+ * Application Controller - Nintendo Switch Style UI
  */
 
 document.addEventListener('DOMContentLoaded', () => {
   // DOM References
+  const switchClock = document.getElementById('switch-clock');
   const emlDropzone = document.getElementById('eml-dropzone');
   const emlFileInput = document.getElementById('eml-file-input');
   const emlDropLabel = document.getElementById('eml-drop-label');
@@ -22,13 +22,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const authorInput = document.getElementById('book-author-input');
   const filenameInput = document.getElementById('output-filename-input');
 
-  const statsBox = document.getElementById('stats-box');
   const statAnnotations = document.getElementById('stat-annotations');
   const statPages = document.getElementById('stat-pages');
   const statWords = document.getElementById('stat-words');
 
   const btnDownloadEpub = document.getElementById('btn-download-epub');
   const btnDownloadPdf = document.getElementById('btn-download-pdf');
+  const btnReset = document.getElementById('btn-reset');
 
   const emptyState = document.getElementById('empty-state');
   const bookContent = document.getElementById('book-content');
@@ -44,10 +44,21 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentCoverMime = null;
   let structuredBlocks = [];
 
-  // ============================
-  // File Drop / Selection Handlers
-  // ============================
+  // Clock Update (Switch Status Bar)
+  function updateClock() {
+    const now = new Date();
+    let hours = now.getHours();
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12 || 12;
+    if (switchClock) {
+      switchClock.textContent = `${hours}:${minutes} ${ampm}`;
+    }
+  }
+  updateClock();
+  setInterval(updateClock, 1000);
 
+  // Setup Dropzone
   function setupDropzone(dropzone, fileInput, onFileSelected) {
     dropzone.addEventListener('click', () => fileInput.click());
 
@@ -78,6 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Setup EML Dropper
   setupDropzone(emlDropzone, emlFileInput, (file) => {
     emlDropLabel.textContent = file.name;
+    emlDropzone.classList.add('is-loaded');
     const reader = new FileReader();
     reader.onload = (e) => {
       const content = e.target.result;
@@ -110,16 +122,15 @@ document.addEventListener('DOMContentLoaded', () => {
       coverPreviewContainer.style.display = 'flex';
       previewCoverElement.src = currentCoverData;
       previewCoverCenter.style.display = 'block';
+      coverDropzone.classList.add('is-loaded');
     } else {
       coverPreviewContainer.style.display = 'none';
       previewCoverCenter.style.display = 'none';
+      coverDropzone.classList.remove('is-loaded');
     }
   }
 
-  // ============================
-  // Slider / Interval Controls
-  // ============================
-
+  // Slider Interval Logic
   function updateSliderLabel(val) {
     if (val >= 95) {
       sliderIntervalLabel.textContent = 'Every Note Separated';
@@ -147,7 +158,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const breakFrequency = parseInt(breakIntervalSlider.value, 10);
 
-    // Re-stitch using user-controlled break frequency
     structuredBlocks = window.EMLParser.stitchContinuousProse(currentParsedData.annotations, {
       breakFrequency: breakFrequency,
       wordsPerPage: 350
@@ -159,10 +169,7 @@ document.addEventListener('DOMContentLoaded', () => {
     renderLivePreview();
   }
 
-  // ============================
-  // EML Processing & Rendering
-  // ============================
-
+  // EML Processing
   function processEmlContent(rawEml, originalFilename) {
     try {
       const parsed = window.EMLParser.parseEmlNotes(rawEml);
@@ -184,12 +191,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
       statAnnotations.textContent = `${parsed.annotations.length} highlights`;
       statWords.textContent = `${totalWords.toLocaleString()} words`;
-      statsBox.style.display = 'flex';
 
       recalculateAndRender();
 
-      btnDownloadEpub.disabled = false;
-      btnDownloadPdf.disabled = false;
+      // Enable Switch Action Bubbles
+      btnDownloadEpub.classList.remove('disabled');
+      btnDownloadPdf.classList.remove('disabled');
     } catch (err) {
       console.error('Error parsing EML:', err);
       alert('Could not parse this .eml file. Please verify it is a valid Apple Books export.');
@@ -210,17 +217,17 @@ document.addEventListener('DOMContentLoaded', () => {
     for (const block of structuredBlocks) {
       if (block.type === 'page-break') {
         const div = document.createElement('div');
-        div.className = 'page-marker-ui';
+        div.className = 'book-page-marker';
         div.textContent = `Page ${block.pageNumber}`;
         previewBodyBlocks.appendChild(div);
       } else if (block.type === 'prose') {
         const p = document.createElement('p');
-        p.className = 'book-prose-p';
+        p.className = 'book-prose';
         p.textContent = block.content;
         previewBodyBlocks.appendChild(p);
       } else if (block.type === 'note') {
         const div = document.createElement('div');
-        div.className = 'book-user-note';
+        div.className = 'book-note';
         div.textContent = block.content;
         previewBodyBlocks.appendChild(div);
       }
@@ -235,17 +242,34 @@ document.addEventListener('DOMContentLoaded', () => {
     previewAuthor.textContent = authorInput.value ? `by ${authorInput.value}` : '';
   });
 
-  // ============================
-  // Export Handlers
-  // ============================
+  // Reset Button
+  btnReset.addEventListener('click', () => {
+    currentParsedData = null;
+    currentCoverData = null;
+    currentCoverMime = null;
+    structuredBlocks = [];
+    emlDropLabel.textContent = 'Insert .eml Export';
+    emlDropzone.classList.remove('is-loaded');
+    coverDropzone.classList.remove('is-loaded');
+    coverPreviewContainer.style.display = 'none';
+    previewCoverCenter.style.display = 'none';
+    titleInput.value = '';
+    authorInput.value = '';
+    filenameInput.value = '';
+    statAnnotations.textContent = '0 highlights';
+    statPages.textContent = '0 pages';
+    statWords.textContent = '0 words';
+    emptyState.style.display = 'block';
+    bookContent.style.display = 'none';
+    btnDownloadEpub.classList.add('disabled');
+    btnDownloadPdf.classList.add('disabled');
+  });
 
-  // EPUB Export
+  // Export EPUB
   btnDownloadEpub.addEventListener('click', async () => {
     if (!currentParsedData) return;
 
-    btnDownloadEpub.disabled = true;
-    const originalText = btnDownloadEpub.innerHTML;
-    btnDownloadEpub.innerHTML = '<span>Generating EPUB...</span>';
+    btnDownloadEpub.classList.add('disabled');
 
     try {
       const blob = await window.EPUBGenerator.generateEpub({
@@ -269,18 +293,15 @@ document.addEventListener('DOMContentLoaded', () => {
       console.error('EPUB Generation error:', err);
       alert('Failed to generate EPUB: ' + err.message);
     } finally {
-      btnDownloadEpub.disabled = false;
-      btnDownloadEpub.innerHTML = originalText;
+      btnDownloadEpub.classList.remove('disabled');
     }
   });
 
-  // PDF Export
+  // Export PDF
   btnDownloadPdf.addEventListener('click', async () => {
     if (!currentParsedData) return;
 
-    btnDownloadPdf.disabled = true;
-    const originalText = btnDownloadPdf.innerHTML;
-    btnDownloadPdf.innerHTML = '<span>Generating PDF...</span>';
+    btnDownloadPdf.classList.add('disabled');
 
     try {
       const filename = (filenameInput.value || 'book-notes').replace(/\.pdf$/i, '') + '.pdf';
@@ -292,8 +313,7 @@ document.addEventListener('DOMContentLoaded', () => {
       console.error('PDF Generation error:', err);
       alert('Failed to generate PDF: ' + err.message);
     } finally {
-      btnDownloadPdf.disabled = false;
-      btnDownloadPdf.innerHTML = originalText;
+      btnDownloadPdf.classList.remove('disabled');
     }
   });
 });
