@@ -4,10 +4,9 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
-  // DOM References
   const clock = document.getElementById('clock');
 
-  // Switch Sound Effects
+  // Switch Sound Effects from switchMenu-main
   const klickSound = document.getElementById('klick');
   const popupSound = document.getElementById('audio');
   const profileSound = document.getElementById('profileSound');
@@ -100,14 +99,15 @@ document.addEventListener('DOMContentLoaded', () => {
     readerPreviewBox.scrollIntoView({ behavior: 'smooth' });
   });
 
-  // Tile 4 & Bubble 3: Slider Modal
+  // Tile 4 & Bubble 3: Stepped Discrete Break Interval Modal
   const tileSlider = document.getElementById('tile-slider');
   const btnOpenSlider = document.getElementById('btn-open-slider');
   const dialogSlider = document.getElementById('dialog-slider');
   const btnCloseSlider = document.getElementById('btn-close-slider');
-  const breakIntervalSlider = document.getElementById('break-interval-slider');
-  const sliderModalVal = document.getElementById('slider-modal-val');
   const sliderSubtext = document.getElementById('slider-subtext');
+  const stopBlockBtns = document.querySelectorAll('.stop-block-btn');
+
+  let currentBreakFrequency = 50; // Default Step 3: Standard Breaks
 
   function openSliderModal() {
     playSound(popupSound);
@@ -122,22 +122,24 @@ document.addEventListener('DOMContentLoaded', () => {
   btnOpenSlider.addEventListener('click', openSliderModal);
   btnCloseSlider.addEventListener('click', closeSliderModal);
 
-  breakIntervalSlider.addEventListener('input', (e) => {
-    const val = parseInt(e.target.value, 10);
-    playSound(klickSound);
-    let label = 'Standard Breaks';
-    if (val >= 95) label = 'Every Note Separated';
-    else if (val >= 65) label = 'Frequent Breaks';
-    else if (val >= 35) label = 'Balanced Breaks';
-    else if (val > 5) label = 'Fewer Breaks';
-    else label = 'Maximum Combined';
+  // Stepped block clicks (5 discrete stops)
+  stopBlockBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      playSound(klickSound);
+      stopBlockBtns.forEach(b => b.classList.remove('is-active'));
+      btn.classList.add('is-active');
 
-    sliderModalVal.textContent = label;
-    sliderSubtext.textContent = label;
+      const step = btn.getAttribute('data-step');
+      const val = parseInt(btn.getAttribute('data-val'), 10);
+      currentBreakFrequency = val;
 
-    if (currentParsedData) {
-      recalculateAndRender();
-    }
+      const desc = btn.querySelector('.stop-block-desc').textContent;
+      sliderSubtext.textContent = `${desc} (Step ${step})`;
+
+      if (currentParsedData) {
+        recalculateAndRender();
+      }
+    });
   });
 
   // Divider Style Select
@@ -275,7 +277,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
       recalculateAndRender();
 
-      // Enable export bubbles
       btnDownloadEpub.classList.remove('disabled');
       btnDownloadPdf.classList.remove('disabled');
     } catch (err) {
@@ -287,9 +288,8 @@ document.addEventListener('DOMContentLoaded', () => {
   function recalculateAndRender() {
     if (!currentParsedData) return;
 
-    const breakFrequency = parseInt(breakIntervalSlider.value, 10);
     structuredBlocks = window.EMLParser.stitchContinuousProse(currentParsedData.annotations, {
-      breakFrequency: breakFrequency,
+      breakFrequency: currentBreakFrequency,
       wordsPerPage: 350
     });
 

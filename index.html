@@ -12,21 +12,24 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
 /* ==========================================================================
-   DIRECT NINTENDO SWITCH MENU LAYOUT (Pure White Screen Edition)
-   1:1 CSS structure from switchMenu-main adapted for Books Notes Converter
+   AUTHENTIC NINTENDO SWITCH MENU LAYOUT (Pure White Theme)
+   Exact match to switchMenu-main with discrete stepped interval selector
    ========================================================================== */
 
 ::-webkit-scrollbar {
   background: transparent;
   width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-thumb {
-  background: #ccc;
-  border-radius: 3px;
+  background: #dcdcdc;
+  border-radius: 4px;
 }
 
 * {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 body {
@@ -37,21 +40,20 @@ body {
   position: relative;
   width: 100%;
   min-height: 100vh;
-  margin: 0;
-  padding: 20px;
   font-family: "Roboto", sans-serif;
   color: #333;
-  background: #ffffff; /* User requirement: White background */
+  background: #ffffff;
+  padding: 20px;
 }
 
 /* Console Inner Screen Border & Wrapper from switchMenu-main */
 .screen-border {
   width: 100%;
   max-width: 1080px;
-  padding: 18px 30px;
+  padding: 20px 36px;
   background: #000000;
   border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.12);
 }
 
 .screen-wrapper {
@@ -68,22 +70,21 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.5rem 0.5rem 1rem;
+  padding: 0.5rem 0.5rem 1.2rem;
   border-bottom: 1px solid #eeeeee;
   letter-spacing: 2px;
 }
 
 .user-icon {
   display: flex;
-  justify-content: flex-start;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   cursor: pointer;
 }
 
 .user-icon-img {
-  width: 52px;
-  height: 52px;
+  width: 54px;
+  height: 54px;
   border-radius: 50%;
   border: 3px solid #fffdfc;
   background-color: #0885a5;
@@ -92,6 +93,7 @@ body {
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  transition: all 0.15s ease;
 }
 
 .user-icon-img img {
@@ -101,8 +103,8 @@ body {
   padding: 2px;
 }
 
-.user-icon.is-highlighted .user-icon-img,
-.user-icon:hover .user-icon-img {
+.user-icon:hover .user-icon-img,
+.user-icon.is-highlighted .user-icon-img {
   outline: 4px solid #3db4ad;
 }
 
@@ -121,28 +123,28 @@ body {
 }
 
 .toolbar * {
-  margin: 0 8px;
+  margin: 0 10px;
 }
 
 #clock {
   font-size: 1.1rem;
   font-weight: 500;
+  letter-spacing: 0.5px;
 }
 
-/* 2. Grid Wrapper from switchMenu-main - The Main Horizontal Game/Card Carousel */
+/* 2. Grid Wrapper - The Authentic Horizontal Game Carousel */
 .grid-wrapper {
   display: grid;
   align-items: center;
-  padding: 2.2rem 0 1.5rem;
+  padding: 2.4rem 0 1.6rem;
   width: 100%;
   grid-template-columns: repeat(auto-fill, 230px);
-  column-gap: 20px;
+  column-gap: 24px;
   grid-auto-flow: column;
   overflow-x: auto;
   overflow-y: hidden;
 }
 
-/* Each Switch Square Game Tile */
 .grid {
   position: relative;
   height: 230px;
@@ -172,7 +174,7 @@ body {
   left: 50%;
   transform: translateX(-50%);
   height: 30px;
-  width: 260px;
+  width: 280px;
   white-space: nowrap;
   text-align: center;
   color: #0885a5;
@@ -190,7 +192,7 @@ body {
 .grid-tile-icon {
   font-size: 44px;
   color: #0885a5;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .grid-tile-title {
@@ -209,21 +211,21 @@ body {
   display: none;
 }
 
-/* Live Reader Modal Card (When user clicks on preview tile) */
+/* Reader Preview Area inside screen */
 .switch-reader-strip {
   width: 100%;
-  margin-top: 10px;
+  margin-top: 6px;
   background: #ffffff;
   border: 1px solid #e0e0e0;
   border-radius: 8px;
-  padding: 24px 32px;
-  max-height: 360px;
+  padding: 28px 36px;
+  max-height: 380px;
   overflow-y: auto;
-  box-shadow: inset 0 1px 4px rgba(0,0,0,0.04);
+  box-shadow: inset 0 1px 4px rgba(0,0,0,0.03);
 }
 
 .book-title-h1 {
-  font-size: 1.6rem;
+  font-size: 1.65rem;
   font-weight: 700;
   text-align: center;
   margin-bottom: 4px;
@@ -232,7 +234,7 @@ body {
   font-size: 1.05rem;
   color: #666;
   text-align: center;
-  margin-bottom: 18px;
+  margin-bottom: 20px;
 }
 .book-divider-hr {
   width: 40px;
@@ -247,7 +249,7 @@ body {
   line-height: 1.75;
   text-align: justify;
   text-indent: 1.6em;
-  margin-bottom: 1em;
+  margin-bottom: 1.1em;
 }
 .book-user-note-block {
   font-family: "Roboto", sans-serif;
@@ -277,15 +279,15 @@ body {
   background: #eee;
 }
 
-/* 3. Circular Action Bubble Tray from switchMenu-main */
+/* 3. Circular Action Bubbles from switchMenu-main */
 .bubble-wrapper {
   display: flex;
   justify-content: center;
   align-items: center;
   width: 100%;
-  gap: 20px;
+  gap: 22px;
   padding-top: 24px;
-  padding-bottom: 30px;
+  padding-bottom: 28px;
 }
 
 .bubble {
@@ -328,7 +330,7 @@ body {
 .bubble .icon {
   display: block;
   margin: auto;
-  font-size: 30px;
+  font-size: 28px;
 }
 
 .bubble.disabled {
@@ -343,7 +345,7 @@ body {
 .fa-tags { color: #aa2eb2; }
 .fa-rotate-left { color: #6a6367; }
 
-/* 4. Screen Footer from switchMenu-main */
+/* 4. Screen Footer from switchMenu-main (Clean & Minimal) */
 .screen-footer {
   display: flex;
   justify-content: space-between;
@@ -354,30 +356,16 @@ body {
   padding: 15px 0;
 }
 
-.gamepad {
-  display: flex;
-  align-items: center;
-  font-size: 32px;
-  color: #333;
-  gap: 14px;
-}
-
-.gamepad-text {
-  font-size: 0.88rem;
+.footer-stats-badge {
+  font-size: 0.95rem;
   font-weight: 500;
-  color: #555;
+  color: #444;
   letter-spacing: 0.5px;
 }
 
 .button-prompts {
-  width: 100%;
   display: flex;
-  justify-content: flex-end;
   align-items: center;
-}
-
-.button-prompts * {
-  margin: 0 20px;
 }
 
 .options {
@@ -386,7 +374,7 @@ body {
   border: 1px solid #333;
   width: 30px;
   border-radius: 30px;
-  font-size: 18px;
+  font-size: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -399,20 +387,21 @@ body {
   left: 50%;
   transform: translate(-50%, -50%);
   font-weight: 700;
+  font-size: 16px;
 }
 
 .options::after {
   content: attr(data-action);
   position: absolute;
   top: 50%;
-  left: 130%;
+  left: 125%;
   transform: translateY(-50%);
   font-size: 15px;
   font-weight: 500;
   white-space: nowrap;
 }
 
-/* Modals for Controls (Sliders, Title Edit) */
+/* Modal Dialogs */
 .switch-dialog-overlay {
   display: none;
   position: fixed;
@@ -436,7 +425,7 @@ body {
   border-radius: 12px;
   width: 90%;
   max-width: 480px;
-  padding: 24px;
+  padding: 26px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.3);
 }
 
@@ -444,7 +433,50 @@ body {
   font-size: 1.25rem;
   font-weight: 700;
   color: #0885a5;
-  margin-bottom: 16px;
+  margin-bottom: 18px;
+}
+
+/* Stepped Discrete Stop Buttons for Break Frequency */
+.stepped-stops-container {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin: 12px 0 16px;
+}
+
+.stop-block-btn {
+  background: #f5f5f5;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  padding: 10px 4px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+
+.stop-block-btn:hover {
+  border-color: #3db4ad;
+  background: #ffffff;
+}
+
+.stop-block-btn.is-active {
+  border-color: #0885a5;
+  background: #eef8fb;
+  box-shadow: 0 0 0 2px rgba(8, 133, 165, 0.2);
+}
+
+.stop-block-level {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #222;
+}
+
+.stop-block-desc {
+  font-size: 0.68rem;
+  color: #666;
+  margin-top: 2px;
+  line-height: 1.2;
 }
 
 .switch-dialog-field {
@@ -475,23 +507,22 @@ body {
 .btn-dialog-close {
   display: block;
   width: 100%;
-  padding: 10px;
-  background: #333;
+  padding: 11px;
+  background: #222;
   color: #fff;
   border: none;
   border-radius: 6px;
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
-  margin-top: 10px;
+  margin-top: 12px;
 }
   </style>
 </head>
 <body>
-  <!-- Authentic Switch Console Inner Screen Border -->
   <div class="screen-border">
     <div class="screen-wrapper">
-      <!-- 1. Screen Header / Top Status Bar -->
+      <!-- 1. Header / Top Status Bar -->
       <div class="screen-header">
         <div class="user-icon is-clickable" id="profile">
           <div class="user-icon-img">
@@ -506,9 +537,9 @@ body {
         </div>
       </div>
 
-      <!-- 2. The Famous Switch Carousel Grid -->
+      <!-- 2. Authentic Horizontal Switch Game Carousel -->
       <div class="grid-wrapper">
-        <!-- Tile 1: EML Drop / Selector -->
+        <!-- Tile 1: EML File Selector -->
         <div class="grid is-clickable" id="tile-eml">
           <div class="game-name"><span id="tile-eml-label">Insert .eml File</span></div>
           <i class="grid-tile-icon fas fa-envelope-open-text"></i>
@@ -517,7 +548,7 @@ body {
           <input type="file" id="eml-file-input" class="file-input-hidden" accept=".eml,message/rfc822,text/plain">
         </div>
 
-        <!-- Tile 2: Cover Image Tile -->
+        <!-- Tile 2: Book Cover Image Tile -->
         <div class="grid is-clickable" id="tile-cover">
           <div class="game-name"><span id="tile-cover-label">Book Cover Art</span></div>
           <i class="grid-tile-icon fas fa-image" id="cover-tile-icon"></i>
@@ -527,7 +558,7 @@ body {
           <input type="file" id="cover-file-input" class="file-input-hidden" accept="image/png,image/jpeg,image/webp">
         </div>
 
-        <!-- Tile 3: Breath of the Wild / Current Book Reader Preview Tile -->
+        <!-- Tile 3: Preview Reader Tile -->
         <div class="grid is-clickable" id="tile-preview">
           <div class="game-name"><span>Notes Preview Reader</span></div>
           <i class="grid-tile-icon fas fa-book-open"></i>
@@ -535,12 +566,12 @@ body {
           <span class="grid-tile-sub" id="preview-card-sub">Waiting for file...</span>
         </div>
 
-        <!-- Tile 4: Slider Settings Tile -->
+        <!-- Tile 4: Stepped Break Intervals Tile -->
         <div class="grid is-clickable" id="tile-slider">
           <div class="game-name"><span>Paragraph Breaks</span></div>
           <i class="grid-tile-icon fas fa-sliders"></i>
-          <span class="grid-tile-title">Interval Control</span>
-          <span class="grid-tile-sub" id="slider-subtext">Standard Breaks</span>
+          <span class="grid-tile-title">Break Steps</span>
+          <span class="grid-tile-sub" id="slider-subtext">Balanced (Step 3)</span>
         </div>
 
         <!-- Tile 5: Title & Author Metadata Tile -->
@@ -552,10 +583,10 @@ body {
         </div>
       </div>
 
-      <!-- Live Reader Preview Strip (Expands inside the Switch Screen) -->
+      <!-- Live Reader Preview Strip -->
       <div class="switch-reader-strip" id="reader-preview-box">
         <div id="reader-empty" style="text-align: center; color: #888; padding: 40px 10px;">
-          <i class="fas fa-gamepad" style="font-size: 36px; margin-bottom: 8px;"></i>
+          <i class="fas fa-book-open" style="font-size: 36px; margin-bottom: 8px; color: #aaa;"></i>
           <p>Select or drop your Apple Books .eml file above to read and export.</p>
         </div>
         <div id="reader-live" style="display: none;">
@@ -566,7 +597,7 @@ body {
         </div>
       </div>
 
-      <!-- 3. Circular Action Bubbles from switchMenu-main -->
+      <!-- 3. Circular Action Bubbles -->
       <div class="bubble-wrapper">
         <div class="bubble is-clickable disabled" id="btn-download-epub" data-option="Download EPUB">
           <i class="icon fas fa-file-arrow-down"></i>
@@ -580,7 +611,7 @@ body {
 
         <div class="bubble is-clickable" id="btn-open-slider" data-option="Break Intervals">
           <i class="icon fas fa-sliders"></i>
-          <div class="bubble-title"><span>Breaks Slider</span></div>
+          <div class="bubble-title"><span>Breaks Selector</span></div>
         </div>
 
         <div class="bubble is-clickable" id="btn-open-meta" data-option="Edit Details">
@@ -594,40 +625,49 @@ body {
         </div>
       </div>
 
-      <!-- 4. Screen Footer from switchMenu-main -->
+      <!-- 4. Clean Switch Footer (Matches switchMenu-main aesthetic) -->
       <div class="screen-footer">
-        <div class="gamepad">
-          <i class="fas fa-gamepad"></i>
-          <div class="gamepad-text">
-            <span id="stat-annotations">0 highlights</span> &bull; 
-            <span id="stat-pages">0 pages</span> &bull; 
-            <span id="stat-words">0 words</span>
-          </div>
+        <div class="footer-stats-badge">
+          <span id="stat-annotations">0 highlights</span> &bull; 
+          <span id="stat-pages">0 pages</span> &bull; 
+          <span id="stat-words">0 words</span>
         </div>
         <div class="button-prompts">
-          <div class="options" data-button="+" data-action="Options"></div>
-          <div class="options start" data-button="A" data-action="Select"></div>
+          <div class="options start" data-button="A" data-action="Start / Export"></div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Modal Dialog 1: Paragraph Breaks Slider & Dividers -->
+  <!-- Modal Dialog 1: Discrete Stepped Break Intervals (5 Distinct Stops) -->
   <div class="switch-dialog-overlay" id="dialog-slider">
     <div class="switch-dialog-card">
-      <div class="switch-dialog-title"><i class="fas fa-sliders"></i> Paragraph Break Intervals</div>
-      <div class="switch-dialog-field">
-        <div style="display: flex; justify-content: space-between;">
-          <label>Break Frequency</label>
-          <span id="slider-modal-val" style="font-size: 0.85rem; color: #0885a5; font-weight: 700;">Standard Breaks</span>
-        </div>
-        <input type="range" id="break-interval-slider" min="0" max="100" value="50" step="1" style="width: 100%; margin: 10px 0;">
-        <div style="display: flex; justify-content: space-between; font-size: 0.72rem; color: #888;">
-          <span>Combined</span>
-          <span>Balanced</span>
-          <span>Every Note</span>
-        </div>
+      <div class="switch-dialog-title"><i class="fas fa-sliders"></i> Paragraph Break Frequency</div>
+      <p style="font-size: 0.82rem; color: #666; margin-bottom: 8px;">Choose one of 5 discrete break stops:</p>
+
+      <div class="stepped-stops-container">
+        <button type="button" class="stop-block-btn" data-step="1" data-val="0">
+          <div class="stop-block-level">1</div>
+          <div class="stop-block-desc">Continuous</div>
+        </button>
+        <button type="button" class="stop-block-btn" data-step="2" data-val="25">
+          <div class="stop-block-level">2</div>
+          <div class="stop-block-desc">Long</div>
+        </button>
+        <button type="button" class="stop-block-btn is-active" data-step="3" data-val="50">
+          <div class="stop-block-level">3</div>
+          <div class="stop-block-desc">Standard</div>
+        </button>
+        <button type="button" class="stop-block-btn" data-step="4" data-val="75">
+          <div class="stop-block-level">4</div>
+          <div class="stop-block-desc">Frequent</div>
+        </button>
+        <button type="button" class="stop-block-btn" data-step="5" data-val="100">
+          <div class="stop-block-level">5</div>
+          <div class="stop-block-desc">Every Note</div>
+        </button>
       </div>
+
       <div class="switch-dialog-field">
         <label for="divider-style-select">Divider Heading Label</label>
         <select id="divider-style-select" class="switch-dialog-input">
@@ -639,10 +679,12 @@ body {
           <option value="none">Nothing / Plain Line</option>
         </select>
       </div>
+
       <div id="custom-divider-wrapper" class="switch-dialog-field" style="display: none;">
         <label for="custom-divider-input">Custom Prefix</label>
-        <input type="text" id="custom-divider-input" class="switch-dialog-input" placeholder="e.g. Highlight or Part">
+        <input type="text" id="custom-divider-input" class="switch-dialog-input" placeholder="e.g. Note or Segment">
       </div>
+
       <button type="button" class="btn-dialog-close" id="btn-close-slider">Done</button>
     </div>
   </div>
