@@ -4,16 +4,16 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Switch Notes Converter</title>
-  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <title>Nintendo Switch - Notes Studio</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
 /* ==========================================================================
-   AUTHENTIC NINTENDO SWITCH MENU LAYOUT (Pure White Theme)
-   Exact match to switchMenu-main with discrete stepped interval selector
+   NINTENDO SWITCH WEB UI 10/10 REVISION (Pure White Console Edition)
+   Combines authentic Switch OS components with seamless Books Notes Converter
    ========================================================================== */
 
 ::-webkit-scrollbar {
@@ -22,7 +22,7 @@
   height: 6px;
 }
 ::-webkit-scrollbar-thumb {
-  background: #dcdcdc;
+  background: #d8d8d8;
   border-radius: 4px;
 }
 
@@ -30,469 +30,481 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  user-select: none;
+  -webkit-user-drag: none;
 }
 
 body {
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  font-family: "Roboto", sans-serif;
+  color: #2c2c2c;
+  background: #ffffff;
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
-  position: relative;
-  width: 100%;
-  min-height: 100vh;
-  font-family: "Roboto", sans-serif;
-  color: #333;
+}
+
+/* Authentic Nintendo Switch Pulse Border Animation (from nintendo-switch-web-ui) */
+@keyframes switchBorderPulse {
+  0% { border-color: #62EFDF; box-shadow: 0 0 12px rgba(98, 239, 223, 0.6); }
+  50% { border-color: #1b98c6; box-shadow: 0 0 16px rgba(27, 152, 198, 0.7); }
+  100% { border-color: #62EFDF; box-shadow: 0 0 12px rgba(98, 239, 223, 0.6); }
+}
+
+.switch-console-screen {
+  width: 100vw;
+  height: 100vh;
   background: #ffffff;
-  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 2.2vh 3.5vw 2.5vh;
 }
 
-/* Console Inner Screen Border & Wrapper from switchMenu-main */
-.screen-border {
-  width: 100%;
-  max-width: 1080px;
-  padding: 20px 36px;
-  background: #000000;
-  border-radius: 20px;
-  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.12);
-}
-
-.screen-wrapper {
-  padding: 1.2rem 1.8rem;
-  border: 1px solid #333;
-  width: 100%;
-  background: #ffffff;
-  border-radius: 6px;
-  margin: auto;
-}
-
-/* 1. Header / Status Bar from switchMenu-main */
-.screen-header {
+/* 1. TOP ROW: Profile & System Status */
+.switch-top-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.5rem 0.5rem 1.2rem;
-  border-bottom: 1px solid #eeeeee;
-  letter-spacing: 2px;
+  height: 7vh;
 }
 
-.user-icon {
+.switch-profiles {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 1.2vw;
   cursor: pointer;
 }
 
-.user-icon-img {
-  width: 54px;
-  height: 54px;
+.switch-profile-avatar {
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
-  border: 3px solid #fffdfc;
-  background-color: #0885a5;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.15);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  border: 3px solid #504F4E;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.15);
   overflow: hidden;
-  transition: all 0.15s ease;
+  background: #0885a5;
+  transition: transform 0.15s ease, border-color 0.15s ease;
 }
 
-.user-icon-img img {
+.switch-profile-avatar img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  padding: 2px;
 }
 
-.user-icon:hover .user-icon-img,
-.user-icon.is-highlighted .user-icon-img {
-  outline: 4px solid #3db4ad;
+.switch-profile-avatar:hover {
+  transform: scale(1.08);
+  border-color: #3db4ad;
 }
 
-.user-title {
+.switch-profile-name {
   font-size: 1.15rem;
   font-weight: 500;
   color: #333;
-  letter-spacing: 0.5px;
 }
 
-.toolbar {
-  font-size: 20px;
-  color: #444;
+.switch-status-tray {
   display: flex;
   align-items: center;
-}
-
-.toolbar * {
-  margin: 0 10px;
-}
-
-#clock {
-  font-size: 1.1rem;
+  gap: 1.4vw;
+  font-size: 1.3rem;
   font-weight: 500;
+  color: #444;
+}
+
+.switch-status-tray svg,
+.switch-status-tray i {
+  color: #444;
+}
+
+/* 2. ACTIVE SELECTION TITLE (from nintendo-switch-web-ui) */
+.switch-active-title-wrap {
+  height: 5vh;
+  margin-top: 1vh;
+  padding-left: 0.5vw;
+}
+
+.switch-active-title {
+  font-size: 1.55rem;
+  font-weight: 600;
+  color: #0885a5;
   letter-spacing: 0.5px;
 }
 
-/* 2. Grid Wrapper - The Authentic Horizontal Game Carousel */
-.grid-wrapper {
-  display: grid;
-  align-items: center;
-  padding: 2.4rem 0 1.6rem;
+/* 3. CENTER CAROUSEL (Game Cards) */
+.switch-carousel-container {
   width: 100%;
-  grid-template-columns: repeat(auto-fill, 230px);
-  column-gap: 24px;
-  grid-auto-flow: column;
+  height: 40vh;
+  display: flex;
+  align-items: center;
   overflow-x: auto;
   overflow-y: hidden;
+  padding: 1.5vh 0.5vw;
+  gap: 1.8vw;
 }
 
-.grid {
+.switch-card {
   position: relative;
-  height: 230px;
-  width: 230px;
-  border: 3px solid #fffdfc;
+  width: 25vh;
+  height: 25vh;
+  min-width: 25vh;
   border-radius: 6px;
   background: #fbfbfb;
-  box-shadow: 2px 2px 4px 1px rgba(0, 0, 0, 0.08);
+  border: 3px solid #ffffff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
   cursor: pointer;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  text-align: center;
   padding: 16px;
-  text-align: center;
-  transition: all 0.12s ease;
+  transition: transform 0.18s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-.grid:hover,
-.grid.is-highlighted {
-  outline: 5px solid #3db4ad;
+.switch-card:hover,
+.switch-card.is-selected {
+  transform: scale(1.1);
+  z-index: 10;
 }
 
-.grid .game-name {
-  position: absolute;
-  top: -36px;
-  left: 50%;
-  transform: translateX(-50%);
-  height: 30px;
-  width: 280px;
-  white-space: nowrap;
-  text-align: center;
+.switch-card.is-selected {
+  animation: switchBorderPulse 1s infinite;
+}
+
+.card-icon {
+  font-size: 3.2rem;
   color: #0885a5;
-  text-shadow: 1px 1px 2px rgba(8, 133, 165, 0.25);
-  font-size: 1.15rem;
-  font-weight: 500;
-  display: none;
+  margin-bottom: 10px;
 }
 
-.grid:hover .game-name,
-.grid.is-highlighted .game-name {
-  display: block;
-}
-
-.grid-tile-icon {
-  font-size: 44px;
-  color: #0885a5;
-  margin-bottom: 12px;
-}
-
-.grid-tile-title {
+.card-title {
   font-size: 1.05rem;
   font-weight: 600;
   color: #222;
   margin-bottom: 4px;
 }
 
-.grid-tile-sub {
+.card-subtitle {
   font-size: 0.8rem;
   color: #777;
 }
 
-.file-input-hidden {
+.card-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: #3db4ad;
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
   display: none;
 }
 
-/* Reader Preview Area inside screen */
-.switch-reader-strip {
-  width: 100%;
-  margin-top: 6px;
-  background: #ffffff;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  padding: 28px 36px;
-  max-height: 380px;
-  overflow-y: auto;
-  box-shadow: inset 0 1px 4px rgba(0,0,0,0.03);
+.switch-card.is-loaded .card-badge {
+  display: block;
 }
 
-.book-title-h1 {
-  font-size: 1.65rem;
+/* Hidden File Inputs */
+.file-hidden {
+  display: none;
+}
+
+/* 4. CIRCULAR OPTION BUTTONS (Album, Controllers, Settings, etc.) */
+.switch-options-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2vw;
+  height: 10vh;
+}
+
+.switch-circle-btn {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 1px solid #d4d4d4;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.15s ease, outline 0.15s ease;
+}
+
+.switch-circle-btn:hover {
+  outline: 4px solid #3db4ad;
+  transform: scale(1.12);
+}
+
+.switch-circle-btn.disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.switch-circle-btn svg,
+.switch-circle-btn i {
+  font-size: 26px;
+  color: #444;
+}
+
+.switch-circle-btn .btn-tooltip {
+  display: none;
+  position: absolute;
+  bottom: -28px;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #0885a5;
+}
+
+.switch-circle-btn:hover .btn-tooltip {
+  display: block;
+}
+
+/* 5. FOOTER & CONTROLLER PROMPTS */
+.switch-footer-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 6vh;
+  border-top: 1px solid #333333;
+  padding-top: 1vh;
+}
+
+.footer-stats-text {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #555;
+  letter-spacing: 0.5px;
+}
+
+.footer-controller-prompts {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+.switch-prompt {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.switch-btn-icon {
+  width: 26px;
+  height: 26px;
+  border: 1.5px solid #333;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 700;
+  background: #ffffff;
+}
+
+/* ==========================================================================
+   MODAL DIALOGS (Reader Strip, Break Steps, Metadata)
+   ========================================================================== */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(3px);
+  z-index: 100;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-overlay.is-open {
+  display: flex;
+}
+
+.modal-card {
+  background: #ffffff;
+  border: 4px solid #3db4ad;
+  border-radius: 12px;
+  width: 92%;
+  max-width: 640px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  padding: 24px 28px;
+  box-shadow: 0 16px 40px rgba(0,0,0,0.3);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #eee;
+}
+
+.modal-title {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #0885a5;
+}
+
+.modal-body {
+  overflow-y: auto;
+  flex: 1;
+}
+
+.btn-modal-close {
+  padding: 10px 18px;
+  background: #2c2c2c;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 16px;
+  align-self: flex-end;
+}
+
+/* 5 Discrete Stepped Stops */
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  margin: 16px 0 20px;
+}
+
+.step-btn {
+  background: #f7f7f7;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  padding: 12px 6px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.step-btn:hover {
+  border-color: #3db4ad;
+  background: #ffffff;
+}
+
+.step-btn.is-active {
+  border-color: #0885a5;
+  background: #eef8fb;
+  box-shadow: 0 0 0 2px rgba(8, 133, 165, 0.25);
+}
+
+.step-number {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #111;
+}
+
+.step-name {
+  font-size: 0.72rem;
+  color: #666;
+  margin-top: 4px;
+}
+
+/* Reader Typography Inside Modal */
+.book-paper-content {
+  font-family: Georgia, serif;
+  color: #1a1a1a;
+  line-height: 1.75;
+  padding: 10px 16px;
+}
+
+.book-h1 {
+  font-size: 1.8rem;
   font-weight: 700;
   text-align: center;
   margin-bottom: 4px;
 }
-.book-author-p {
-  font-size: 1.05rem;
+
+.book-auth {
+  font-size: 1.1rem;
   color: #666;
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 18px;
 }
-.book-divider-hr {
+
+.book-divider-line {
   width: 40px;
   height: 1px;
   background: #ccc;
-  margin: 14px auto 26px;
+  margin: 14px auto 24px;
   border: 0;
 }
-.book-prose-block {
-  font-family: Georgia, serif;
+
+.book-p {
   font-size: 1.05rem;
-  line-height: 1.75;
   text-align: justify;
   text-indent: 1.6em;
   margin-bottom: 1.1em;
 }
-.book-user-note-block {
+
+.book-note-card {
   font-family: "Roboto", sans-serif;
-  background: #fafafa;
+  background: #f8f8f8;
   border-left: 3px solid #222;
   padding: 10px 14px;
   margin: 1.4em 0;
   font-style: italic;
   font-size: 0.95rem;
 }
-.book-page-marker-block {
+
+.book-marker-tag {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 12px;
   margin: 28px 0 20px;
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   color: #888;
   text-transform: uppercase;
   letter-spacing: 0.1em;
 }
-.book-page-marker-block::before,
-.book-page-marker-block::after {
+
+.book-marker-tag::before,
+.book-marker-tag::after {
   content: "";
   flex: 1;
   height: 1px;
   background: #eee;
 }
 
-/* 3. Circular Action Bubbles from switchMenu-main */
-.bubble-wrapper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  gap: 22px;
-  padding-top: 24px;
-  padding-bottom: 28px;
-}
-
-.bubble {
-  display: flex;
-  position: relative;
-  box-shadow: 1px 1px 2px 1px rgba(0, 0, 0, 0.08);
-  border-radius: 50%;
-  height: 65px;
-  width: 65px;
-  background: #fffdfc;
-  cursor: pointer;
-  transition: all 0.12s ease;
-}
-
-.bubble:hover,
-.bubble.is-highlighted {
-  outline: 4px solid #3db4ad;
-}
-
-.bubble:hover .bubble-title,
-.bubble.is-highlighted .bubble-title {
-  display: block;
-}
-
-.bubble-title {
-  display: none;
-  position: absolute;
-  width: 140px;
-  bottom: -25px;
-  left: 50%;
-  transform: translateX(-50%);
-  white-space: nowrap;
-  text-align: center;
-  color: #0885a5;
-  text-shadow: 1px 1px 2px rgba(8, 133, 165, 0.3);
-  font-size: 15px;
-  font-weight: 500;
-}
-
-.bubble .icon {
-  display: block;
-  margin: auto;
-  font-size: 28px;
-}
-
-.bubble.disabled {
-  opacity: 0.35;
-  cursor: not-allowed;
-  pointer-events: none;
-}
-
-.fa-file-arrow-down { color: #d54f53; }
-.fa-file-pdf { color: #f7a21e; }
-.fa-sliders { color: #276bda; }
-.fa-tags { color: #aa2eb2; }
-.fa-rotate-left { color: #6a6367; }
-
-/* 4. Screen Footer from switchMenu-main (Clean & Minimal) */
-.screen-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-top: 1px solid #333;
-  height: 50px;
-  width: 100%;
-  padding: 15px 0;
-}
-
-.footer-stats-badge {
-  font-size: 0.95rem;
-  font-weight: 500;
-  color: #444;
-  letter-spacing: 0.5px;
-}
-
-.button-prompts {
-  display: flex;
-  align-items: center;
-}
-
-.options {
-  position: relative;
-  height: 30px;
-  border: 1px solid #333;
-  width: 30px;
-  border-radius: 30px;
-  font-size: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.options::before {
-  content: attr(data-button);
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-weight: 700;
-  font-size: 16px;
-}
-
-.options::after {
-  content: attr(data-action);
-  position: absolute;
-  top: 50%;
-  left: 125%;
-  transform: translateY(-50%);
-  font-size: 15px;
-  font-weight: 500;
-  white-space: nowrap;
-}
-
-/* Modal Dialogs */
-.switch-dialog-overlay {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.45);
-  z-index: 1000;
-  justify-content: center;
-  align-items: center;
-}
-
-.switch-dialog-overlay.is-visible {
-  display: flex;
-}
-
-.switch-dialog-card {
-  background: #ffffff;
-  border: 4px solid #3db4ad;
-  border-radius: 12px;
-  width: 90%;
-  max-width: 480px;
-  padding: 26px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-}
-
-.switch-dialog-title {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #0885a5;
-  margin-bottom: 18px;
-}
-
-/* Stepped Discrete Stop Buttons for Break Frequency */
-.stepped-stops-container {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 8px;
-  margin: 12px 0 16px;
-}
-
-.stop-block-btn {
-  background: #f5f5f5;
-  border: 2px solid #ddd;
-  border-radius: 8px;
-  padding: 10px 4px;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  font-family: inherit;
-}
-
-.stop-block-btn:hover {
-  border-color: #3db4ad;
-  background: #ffffff;
-}
-
-.stop-block-btn.is-active {
-  border-color: #0885a5;
-  background: #eef8fb;
-  box-shadow: 0 0 0 2px rgba(8, 133, 165, 0.2);
-}
-
-.stop-block-level {
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: #222;
-}
-
-.stop-block-desc {
-  font-size: 0.68rem;
-  color: #666;
-  margin-top: 2px;
-  line-height: 1.2;
-}
-
-.switch-dialog-field {
+.input-row {
   display: flex;
   flex-direction: column;
   gap: 6px;
   margin-bottom: 14px;
 }
 
-.switch-dialog-field label {
+.input-row label {
   font-size: 0.85rem;
   font-weight: 600;
   color: #555;
 }
 
-.switch-dialog-input {
+.input-box {
   font-size: 0.95rem;
   padding: 8px 12px;
   border: 1px solid #ccc;
@@ -500,216 +512,225 @@ body {
   outline: none;
 }
 
-.switch-dialog-input:focus {
+.input-box:focus {
   border-color: #3db4ad;
-}
-
-.btn-dialog-close {
-  display: block;
-  width: 100%;
-  padding: 11px;
-  background: #222;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  font-size: 0.95rem;
-  font-weight: 600;
-  cursor: pointer;
-  margin-top: 12px;
 }
   </style>
 </head>
 <body>
-  <div class="screen-border">
-    <div class="screen-wrapper">
-      <!-- 1. Header / Top Status Bar -->
-      <div class="screen-header">
-        <div class="user-icon is-clickable" id="profile">
-          <div class="user-icon-img">
-            <img src="./img/cuphead-logo.png" alt="Profile">
-          </div>
-          <span class="user-title">Aaron's Notes</span>
+
+  <!-- Fullscreen Nintendo Switch Viewport -->
+  <main class="switch-console-screen">
+    
+    <!-- 1. Top Row: Profile & Status Tray -->
+    <header class="switch-top-row">
+      <div class="switch-profiles" id="profile-btn">
+        <div class="switch-profile-avatar">
+          <img src="./img/cuphead-logo.png" alt="Profile">
         </div>
-        <div class="toolbar">
-          <span id="clock">12:00 PM</span>
-          <i class="fas fa-wifi"></i>
-          <i class="fas fa-battery-three-quarters"></i>
-        </div>
+        <span class="switch-profile-name">Aaron's Studio</span>
       </div>
 
-      <!-- 2. Authentic Horizontal Switch Game Carousel -->
-      <div class="grid-wrapper">
-        <!-- Tile 1: EML File Selector -->
-        <div class="grid is-clickable" id="tile-eml">
-          <div class="game-name"><span id="tile-eml-label">Insert .eml File</span></div>
-          <i class="grid-tile-icon fas fa-envelope-open-text"></i>
-          <span class="grid-tile-title">Apple Notes .eml</span>
-          <span class="grid-tile-sub" id="eml-subtext">Click or Drop file</span>
-          <input type="file" id="eml-file-input" class="file-input-hidden" accept=".eml,message/rfc822,text/plain">
-        </div>
+      <div class="switch-status-tray">
+        <span id="clock">12:00 PM</span>
+        <i class="fas fa-wifi"></i>
+        <i class="fas fa-battery-three-quarters"></i>
+      </div>
+    </header>
 
-        <!-- Tile 2: Book Cover Image Tile -->
-        <div class="grid is-clickable" id="tile-cover">
-          <div class="game-name"><span id="tile-cover-label">Book Cover Art</span></div>
-          <i class="grid-tile-icon fas fa-image" id="cover-tile-icon"></i>
-          <img id="cover-tile-img" style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 4px;" alt="Cover">
-          <span class="grid-tile-title" id="cover-tile-text">Optional Cover</span>
-          <span class="grid-tile-sub" id="cover-subtext">PNG, JPG, WEBP</span>
-          <input type="file" id="cover-file-input" class="file-input-hidden" accept="image/png,image/jpeg,image/webp">
-        </div>
+    <!-- 2. Active Selected Title -->
+    <div class="switch-active-title-wrap">
+      <h2 class="switch-active-title" id="active-title-banner">Apple Books Notes .eml</h2>
+    </div>
 
-        <!-- Tile 3: Preview Reader Tile -->
-        <div class="grid is-clickable" id="tile-preview">
-          <div class="game-name"><span>Notes Preview Reader</span></div>
-          <i class="grid-tile-icon fas fa-book-open"></i>
-          <span class="grid-tile-title" id="preview-card-title">Book Notes</span>
-          <span class="grid-tile-sub" id="preview-card-sub">Waiting for file...</span>
-        </div>
-
-        <!-- Tile 4: Stepped Break Intervals Tile -->
-        <div class="grid is-clickable" id="tile-slider">
-          <div class="game-name"><span>Paragraph Breaks</span></div>
-          <i class="grid-tile-icon fas fa-sliders"></i>
-          <span class="grid-tile-title">Break Steps</span>
-          <span class="grid-tile-sub" id="slider-subtext">Balanced (Step 3)</span>
-        </div>
-
-        <!-- Tile 5: Title & Author Metadata Tile -->
-        <div class="grid is-clickable" id="tile-meta">
-          <div class="game-name"><span>Book Information</span></div>
-          <i class="grid-tile-icon fas fa-pen-nib"></i>
-          <span class="grid-tile-title">Metadata</span>
-          <span class="grid-tile-sub" id="meta-subtext">Edit Title / Author</span>
-        </div>
+    <!-- 3. Horizontal Switch Carousel Cards -->
+    <section class="switch-carousel-container" id="carousel">
+      <!-- Card 1: EML Input -->
+      <div class="switch-card is-selected" id="card-eml" data-title="Apple Notes .eml Export">
+        <span class="card-badge" id="eml-badge">READY</span>
+        <i class="card-icon fas fa-envelope-open-text"></i>
+        <h3 class="card-title">Insert .eml</h3>
+        <p class="card-subtitle" id="eml-subtext">Click or Drop file</p>
+        <input type="file" id="eml-file-input" class="file-hidden" accept=".eml,message/rfc822,text/plain">
       </div>
 
-      <!-- Live Reader Preview Strip -->
-      <div class="switch-reader-strip" id="reader-preview-box">
+      <!-- Card 2: Cover Art -->
+      <div class="switch-card" id="card-cover" data-title="Optional Book Cover">
+        <span class="card-badge" id="cover-badge">LOADED</span>
+        <i class="card-icon fas fa-image" id="cover-icon"></i>
+        <img id="cover-thumb" style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 4px;" alt="Cover">
+        <h3 class="card-title" id="cover-title-text">Cover Image</h3>
+        <p class="card-subtitle" id="cover-subtext">PNG, JPG, WEBP</p>
+        <input type="file" id="cover-file-input" class="file-hidden" accept="image/png,image/jpeg,image/webp">
+      </div>
+
+      <!-- Card 3: Live Reader Preview -->
+      <div class="switch-card" id="card-reader" data-title="Continuous Book Reader">
+        <i class="card-icon fas fa-book-open"></i>
+        <h3 class="card-title" id="reader-card-title">Book Reader</h3>
+        <p class="card-subtitle" id="reader-card-sub">Click to Open</p>
+      </div>
+
+      <!-- Card 4: Break Frequency Steps -->
+      <div class="switch-card" id="card-breaks" data-title="Paragraph Break Frequency">
+        <i class="card-icon fas fa-sliders"></i>
+        <h3 class="card-title">Break Steps</h3>
+        <p class="card-subtitle" id="breaks-card-sub">Standard (Step 3)</p>
+      </div>
+
+      <!-- Card 5: Book Metadata -->
+      <div class="switch-card" id="card-meta" data-title="Book Information & Title">
+        <i class="card-icon fas fa-pen-nib"></i>
+        <h3 class="card-title">Metadata</h3>
+        <p class="card-subtitle" id="meta-card-sub">Edit Details</p>
+      </div>
+    </section>
+
+    <!-- 4. Circular Option Buttons -->
+    <div class="switch-options-row">
+      <div class="switch-circle-btn disabled" id="btn-epub" title="Export EPUB for Apple Books">
+        <i class="fas fa-file-arrow-down" style="color: #d54f53;"></i>
+        <span class="btn-tooltip">Download EPUB</span>
+      </div>
+
+      <div class="switch-circle-btn disabled" id="btn-pdf" title="Export PDF Document">
+        <i class="fas fa-file-pdf" style="color: #f7a21e;"></i>
+        <span class="btn-tooltip">Download PDF</span>
+      </div>
+
+      <div class="switch-circle-btn" id="btn-reader-open" title="Open Live Reader">
+        <i class="fas fa-book-open" style="color: #276bda;"></i>
+        <span class="btn-tooltip">Read Notes</span>
+      </div>
+
+      <div class="switch-circle-btn" id="btn-steps-open" title="Adjust Break Stops">
+        <i class="fas fa-sliders" style="color: #aa2eb2;"></i>
+        <span class="btn-tooltip">Paragraph Stops</span>
+      </div>
+
+      <div class="switch-circle-btn" id="btn-reset" title="Reset All">
+        <i class="fas fa-rotate-left" style="color: #6a6367;"></i>
+        <span class="btn-tooltip">Reset</span>
+      </div>
+    </div>
+
+    <!-- 5. Footer with Statistics & Start Button Prompt -->
+    <footer class="switch-footer-row">
+      <div class="footer-stats-text">
+        <span id="stat-annotations">0 highlights</span> &bull; 
+        <span id="stat-pages">0 pages</span> &bull; 
+        <span id="stat-words">0 words</span>
+      </div>
+
+      <div class="footer-controller-prompts">
+        <div class="switch-prompt">
+          <div class="switch-btn-icon">A</div>
+          <span>Start / Export</span>
+        </div>
+      </div>
+    </footer>
+  </main>
+
+  <!-- MODAL 1: Live Book Reader -->
+  <div class="modal-overlay" id="modal-reader">
+    <div class="modal-card" style="max-width: 780px;">
+      <div class="modal-header">
+        <h2 class="modal-title"><i class="fas fa-book-open"></i> Live Book Preview</h2>
+        <span style="font-size: 0.85rem; color: #777;">Chronological &bull; Dates Removed</span>
+      </div>
+      <div class="modal-body book-paper-content" id="reader-body">
         <div id="reader-empty" style="text-align: center; color: #888; padding: 40px 10px;">
-          <i class="fas fa-book-open" style="font-size: 36px; margin-bottom: 8px; color: #aaa;"></i>
-          <p>Select or drop your Apple Books .eml file above to read and export.</p>
+          <p>No notes loaded yet. Drop or select your .eml file on the Home Screen.</p>
         </div>
         <div id="reader-live" style="display: none;">
-          <h1 id="preview-title" class="book-title-h1"></h1>
-          <p id="preview-author" class="book-author-p"></p>
-          <hr class="book-divider-hr">
+          <h1 id="preview-title" class="book-h1"></h1>
+          <p id="preview-author" class="book-auth"></p>
+          <hr class="book-divider-line">
           <div id="preview-blocks"></div>
         </div>
       </div>
-
-      <!-- 3. Circular Action Bubbles -->
-      <div class="bubble-wrapper">
-        <div class="bubble is-clickable disabled" id="btn-download-epub" data-option="Download EPUB">
-          <i class="icon fas fa-file-arrow-down"></i>
-          <div class="bubble-title"><span>Download EPUB</span></div>
-        </div>
-
-        <div class="bubble is-clickable disabled" id="btn-download-pdf" data-option="Download PDF">
-          <i class="icon fas fa-file-pdf"></i>
-          <div class="bubble-title"><span>Download PDF</span></div>
-        </div>
-
-        <div class="bubble is-clickable" id="btn-open-slider" data-option="Break Intervals">
-          <i class="icon fas fa-sliders"></i>
-          <div class="bubble-title"><span>Breaks Selector</span></div>
-        </div>
-
-        <div class="bubble is-clickable" id="btn-open-meta" data-option="Edit Details">
-          <i class="icon fas fa-tags"></i>
-          <div class="bubble-title"><span>Metadata</span></div>
-        </div>
-
-        <div class="bubble is-clickable" id="btn-reset" data-option="Reset All">
-          <i class="icon fas fa-rotate-left"></i>
-          <div class="bubble-title"><span>Reset</span></div>
-        </div>
-      </div>
-
-      <!-- 4. Clean Switch Footer (Matches switchMenu-main aesthetic) -->
-      <div class="screen-footer">
-        <div class="footer-stats-badge">
-          <span id="stat-annotations">0 highlights</span> &bull; 
-          <span id="stat-pages">0 pages</span> &bull; 
-          <span id="stat-words">0 words</span>
-        </div>
-        <div class="button-prompts">
-          <div class="options start" data-button="A" data-action="Start / Export"></div>
-        </div>
-      </div>
+      <button type="button" class="btn-modal-close" id="btn-close-reader">Close</button>
     </div>
   </div>
 
-  <!-- Modal Dialog 1: Discrete Stepped Break Intervals (5 Distinct Stops) -->
-  <div class="switch-dialog-overlay" id="dialog-slider">
-    <div class="switch-dialog-card">
-      <div class="switch-dialog-title"><i class="fas fa-sliders"></i> Paragraph Break Frequency</div>
-      <p style="font-size: 0.82rem; color: #666; margin-bottom: 8px;">Choose one of 5 discrete break stops:</p>
-
-      <div class="stepped-stops-container">
-        <button type="button" class="stop-block-btn" data-step="1" data-val="0">
-          <div class="stop-block-level">1</div>
-          <div class="stop-block-desc">Continuous</div>
-        </button>
-        <button type="button" class="stop-block-btn" data-step="2" data-val="25">
-          <div class="stop-block-level">2</div>
-          <div class="stop-block-desc">Long</div>
-        </button>
-        <button type="button" class="stop-block-btn is-active" data-step="3" data-val="50">
-          <div class="stop-block-level">3</div>
-          <div class="stop-block-desc">Standard</div>
-        </button>
-        <button type="button" class="stop-block-btn" data-step="4" data-val="75">
-          <div class="stop-block-level">4</div>
-          <div class="stop-block-desc">Frequent</div>
-        </button>
-        <button type="button" class="stop-block-btn" data-step="5" data-val="100">
-          <div class="stop-block-level">5</div>
-          <div class="stop-block-desc">Every Note</div>
-        </button>
+  <!-- MODAL 2: 5 Discrete Break Steps & Divider Style -->
+  <div class="modal-overlay" id="modal-breaks">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 class="modal-title"><i class="fas fa-sliders"></i> Paragraph Break Frequency</h2>
       </div>
+      <div class="modal-body">
+        <p style="font-size: 0.88rem; color: #555;">Select one of 5 discrete paragraph break levels:</p>
 
-      <div class="switch-dialog-field">
-        <label for="divider-style-select">Divider Heading Label</label>
-        <select id="divider-style-select" class="switch-dialog-input">
-          <option value="Page">Page (Page 1, Page 2...)</option>
-          <option value="Chapter">Chapter (Chapter 1, Chapter 2...)</option>
-          <option value="Section">Section (Section 1, Section 2...)</option>
-          <option value="Part">Part (Part 1, Part 2...)</option>
-          <option value="custom">Custom Prefix...</option>
-          <option value="none">Nothing / Plain Line</option>
-        </select>
+        <div class="steps-grid">
+          <button type="button" class="step-btn" data-step="1" data-val="0">
+            <div class="step-number">1</div>
+            <div class="step-name">Continuous</div>
+          </button>
+          <button type="button" class="step-btn" data-step="2" data-val="25">
+            <div class="step-number">2</div>
+            <div class="step-name">Long</div>
+          </button>
+          <button type="button" class="step-btn is-active" data-step="3" data-val="50">
+            <div class="step-number">3</div>
+            <div class="step-name">Standard</div>
+          </button>
+          <button type="button" class="step-btn" data-step="4" data-val="75">
+            <div class="step-number">4</div>
+            <div class="step-name">Frequent</div>
+          </button>
+          <button type="button" class="step-btn" data-step="5" data-val="100">
+            <div class="step-number">5</div>
+            <div class="step-name">Every Note</div>
+          </button>
+        </div>
+
+        <div class="input-row">
+          <label for="divider-select">Divider Heading Format</label>
+          <select id="divider-select" class="input-box">
+            <option value="Page">Page (Page 1, Page 2...)</option>
+            <option value="Chapter">Chapter (Chapter 1, Chapter 2...)</option>
+            <option value="Section">Section (Section 1, Section 2...)</option>
+            <option value="Part">Part (Part 1, Part 2...)</option>
+            <option value="custom">Custom Prefix...</option>
+            <option value="none">Nothing / Plain Line</option>
+          </select>
+        </div>
+
+        <div id="custom-divider-wrapper" class="input-row" style="display: none;">
+          <label for="custom-divider-input">Custom Prefix Label</label>
+          <input type="text" id="custom-divider-input" class="input-box" placeholder="e.g. Note or Segment">
+        </div>
       </div>
-
-      <div id="custom-divider-wrapper" class="switch-dialog-field" style="display: none;">
-        <label for="custom-divider-input">Custom Prefix</label>
-        <input type="text" id="custom-divider-input" class="switch-dialog-input" placeholder="e.g. Note or Segment">
-      </div>
-
-      <button type="button" class="btn-dialog-close" id="btn-close-slider">Done</button>
+      <button type="button" class="btn-modal-close" id="btn-close-breaks">Done</button>
     </div>
   </div>
 
-  <!-- Modal Dialog 2: Edit Metadata -->
-  <div class="switch-dialog-overlay" id="dialog-meta">
-    <div class="switch-dialog-card">
-      <div class="switch-dialog-title"><i class="fas fa-tags"></i> Book Information</div>
-      <div class="switch-dialog-field">
-        <label for="book-title-input">Book Title</label>
-        <input type="text" id="book-title-input" class="switch-dialog-input" placeholder="Book Title">
+  <!-- MODAL 3: Book Metadata Details -->
+  <div class="modal-overlay" id="modal-meta">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 class="modal-title"><i class="fas fa-pen-nib"></i> Book Information</h2>
       </div>
-      <div class="switch-dialog-field">
-        <label for="book-author-input">Author</label>
-        <input type="text" id="book-author-input" class="switch-dialog-input" placeholder="Author">
+      <div class="modal-body">
+        <div class="input-row">
+          <label for="book-title-input">Book Title</label>
+          <input type="text" id="book-title-input" class="input-box" placeholder="Title">
+        </div>
+        <div class="input-row">
+          <label for="book-author-input">Author Name</label>
+          <input type="text" id="book-author-input" class="input-box" placeholder="Author">
+        </div>
+        <div class="input-row">
+          <label for="output-filename-input">Output Filename</label>
+          <input type="text" id="output-filename-input" class="input-box" placeholder="filename">
+        </div>
       </div>
-      <div class="switch-dialog-field">
-        <label for="output-filename-input">Output Filename</label>
-        <input type="text" id="output-filename-input" class="switch-dialog-input" placeholder="filename">
-      </div>
-      <button type="button" class="btn-dialog-close" id="btn-close-meta">Done</button>
+      <button type="button" class="btn-modal-close" id="btn-close-meta">Done</button>
     </div>
   </div>
 
-  <!-- Audio Elements from switchMenu-main -->
+  <!-- Switch Audio Elements -->
   <audio id="audio" src="./sounds/Popup.wav"></audio>
   <audio id="profileSound" src="./sounds/User.wav"></audio>
   <audio id="klick" src="./sounds/Klick.wav"></audio>
