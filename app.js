@@ -1,6 +1,7 @@
 /**
  * Nintendo Switch Notes Studio Controller
- * Fullscreen Switch OS UI with audio, 5-step discrete intervals, and live live reader
+ * Progressive disclosure (initial centered slot -> loaded carousel)
+ * Live Reader with side-by-side break steps & metadata panel
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -40,12 +41,64 @@ document.addEventListener('DOMContentLoaded', () => {
     profileBtn.addEventListener('click', () => playSound(profileSound));
   }
 
-  // Carousel Active Title & Selection
+  // Active Title Banner & Cards
   const activeTitleBanner = document.getElementById('active-title-banner');
-  const cards = document.querySelectorAll('.switch-card');
+  const cardEml = document.getElementById('card-eml');
+  const cardBook = document.getElementById('card-book');
+  const cardCover = document.getElementById('card-cover');
+  const cardChangeFile = document.getElementById('card-change-file');
 
+  const emlFileInput = document.getElementById('eml-file-input');
+  const coverFileInput = document.getElementById('cover-file-input');
+
+  const cardEmlTitle = document.getElementById('card-eml-title');
+  const emlSubtext = document.getElementById('eml-subtext');
+  const emlBadge = document.getElementById('eml-badge');
+
+  const bookCardTitle = document.getElementById('book-card-title');
+  const bookCardSub = document.getElementById('book-card-sub');
+
+  const coverThumb = document.getElementById('cover-thumb');
+  const coverIcon = document.getElementById('cover-icon');
+  const coverTitleText = document.getElementById('cover-title-text');
+  const coverSubtext = document.getElementById('cover-subtext');
+  const coverBadge = document.getElementById('cover-badge');
+
+  const footerStats = document.getElementById('footer-stats');
+
+  const btnEpub = document.getElementById('btn-epub');
+  const btnPdf = document.getElementById('btn-pdf');
+  const btnRead = document.getElementById('btn-read');
+  const btnReset = document.getElementById('btn-reset');
+
+  // Reader Modal Elements
+  const modalReader = document.getElementById('modal-reader');
+  const btnCloseReader = document.getElementById('btn-close-reader');
+  const readerModalTitleText = document.getElementById('reader-modal-title-text');
+  const previewTitle = document.getElementById('preview-title');
+  const previewAuthor = document.getElementById('preview-author');
+  const previewBlocks = document.getElementById('preview-blocks');
+
+  // Side Controls Inside Reader Modal
+  const stepBlockItems = document.querySelectorAll('.step-block-item');
+  const dividerSelect = document.getElementById('divider-select');
+  const customDividerWrapper = document.getElementById('custom-divider-wrapper');
+  const customDividerInput = document.getElementById('custom-divider-input');
+
+  const titleInput = document.getElementById('book-title-input');
+  const authorInput = document.getElementById('book-author-input');
+  const filenameInput = document.getElementById('output-filename-input');
+
+  // App State
+  let currentParsedData = null;
+  let currentCoverData = null;
+  let currentCoverMime = null;
+  let structuredBlocks = [];
+  let currentBreakFrequency = 50; // Step 3 Standard
+
+  // Helper to select card
   function selectCard(card) {
-    cards.forEach(c => c.classList.remove('is-selected'));
+    document.querySelectorAll('.switch-card').forEach(c => c.classList.remove('is-selected'));
     card.classList.add('is-selected');
     const title = card.getAttribute('data-title') || '';
     if (activeTitleBanner) {
@@ -54,16 +107,11 @@ document.addEventListener('DOMContentLoaded', () => {
     playSound(klickSound);
   }
 
-  cards.forEach(card => {
+  [cardEml, cardBook, cardCover, cardChangeFile].forEach(card => {
     card.addEventListener('mouseenter', () => selectCard(card));
   });
 
-  // Card 1: EML File Selector
-  const cardEml = document.getElementById('card-eml');
-  const emlFileInput = document.getElementById('eml-file-input');
-  const emlSubtext = document.getElementById('eml-subtext');
-  const emlBadge = document.getElementById('eml-badge');
-
+  // Card 1: Initial EML Selector
   cardEml.addEventListener('click', () => emlFileInput.click());
   cardEml.addEventListener('dragover', (e) => { e.preventDefault(); cardEml.classList.add('is-selected'); });
   cardEml.addEventListener('drop', (e) => {
@@ -78,15 +126,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Card 2: Book Cover Selector
-  const cardCover = document.getElementById('card-cover');
-  const coverFileInput = document.getElementById('cover-file-input');
-  const coverThumb = document.getElementById('cover-thumb');
-  const coverIcon = document.getElementById('cover-icon');
-  const coverTitleText = document.getElementById('cover-title-text');
-  const coverSubtext = document.getElementById('cover-subtext');
-  const coverBadge = document.getElementById('cover-badge');
+  // Card: Change File Click
+  cardChangeFile.addEventListener('click', () => emlFileInput.click());
 
+  // Card: Book Click -> Opens Reader
+  cardBook.addEventListener('click', openReaderModal);
+  btnRead.addEventListener('click', openReaderModal);
+
+  // Card 2: Cover Art Slot
   cardCover.addEventListener('click', () => coverFileInput.click());
   cardCover.addEventListener('dragover', (e) => { e.preventDefault(); cardCover.classList.add('is-selected'); });
   cardCover.addEventListener('drop', (e) => {
@@ -101,72 +148,113 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Card 3 & Option Button 3: Reader Modal
-  const cardReader = document.getElementById('card-reader');
-  const btnReaderOpen = document.getElementById('btn-reader-open');
-  const modalReader = document.getElementById('modal-reader');
-  const btnCloseReader = document.getElementById('btn-close-reader');
+  function handleEmlFile(file) {
+    playSound(newsSound);
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      processEml(e.target.result, file.name);
+    };
+    reader.readAsText(file);
+  }
 
-  function openReaderModal() {
+  function handleCoverFile(file) {
     playSound(popupSound);
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      currentCoverData = e.target.result;
+      currentCoverMime = file.type || 'image/jpeg';
+      coverThumb.src = currentCoverData;
+      coverThumb.style.display = 'block';
+      coverIcon.style.display = 'none';
+      coverTitleText.textContent = 'Cover Set';
+      coverSubtext.textContent = file.name.slice(0, 14);
+      cardCover.classList.add('is-loaded');
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function processEml(rawEml, filename) {
+    try {
+      const parsed = window.EMLParser.parseEmlNotes(rawEml);
+      currentParsedData = parsed;
+
+      const safeTitle = (parsed.title || 'book-notes')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+
+      titleInput.value = parsed.title || '';
+      authorInput.value = parsed.author || '';
+      filenameInput.value = safeTitle || 'notes';
+
+      // Update Card Labels
+      bookCardTitle.textContent = (parsed.title || 'Book Notes').slice(0, 16) + '...';
+      bookCardSub.textContent = `${parsed.annotations.length} highlights`;
+
+      const totalWords = parsed.annotations.reduce((acc, curr) => {
+        const words = (curr.text + ' ' + curr.note).trim().split(/\s+/).filter(Boolean).length;
+        return acc + words;
+      }, 0);
+
+      // Progressive disclosure: Hide cardEml, show cardBook, cardCover, cardChangeFile
+      cardEml.style.display = 'none';
+      cardBook.style.display = 'flex';
+      cardCover.style.display = 'flex';
+      cardChangeFile.style.display = 'flex';
+
+      // Select Book Card as active
+      selectCard(cardBook);
+
+      // Enable Action Buttons
+      btnEpub.classList.remove('disabled');
+      btnPdf.classList.remove('disabled');
+      btnRead.classList.remove('disabled');
+
+      recalculateAndRender();
+
+      // Update Footer Stats
+      footerStats.textContent = `${parsed.annotations.length} highlights • ${structuredBlocks.filter(b => b.type === 'page-break').length} pages • ${totalWords.toLocaleString()} words`;
+    } catch (err) {
+      console.error(err);
+      alert('Could not parse .eml file. Please verify it is a valid Apple Books export.');
+    }
+  }
+
+  // Open / Close Reader Modal
+  function openReaderModal() {
+    if (!currentParsedData) return;
+    playSound(popupSound);
+    readerModalTitleText.textContent = titleInput.value || 'Book Reader';
     modalReader.classList.add('is-open');
   }
+
   function closeReaderModal() {
     playSound(klickSound);
     modalReader.classList.remove('is-open');
   }
 
-  cardReader.addEventListener('click', openReaderModal);
-  btnReaderOpen.addEventListener('click', openReaderModal);
   btnCloseReader.addEventListener('click', closeReaderModal);
+  modalReader.addEventListener('click', (e) => {
+    if (e.target === modalReader) {
+      closeReaderModal();
+    }
+  });
 
-  // Card 4 & Option Button 4: Break Steps Modal
-  const cardBreaks = document.getElementById('card-breaks');
-  const btnStepsOpen = document.getElementById('btn-steps-open');
-  const modalBreaks = document.getElementById('modal-breaks');
-  const btnCloseBreaks = document.getElementById('btn-close-breaks');
-  const breaksCardSub = document.getElementById('breaks-card-sub');
-  const stepBtns = document.querySelectorAll('.step-btn');
-
-  let currentBreakFrequency = 50; // Step 3 Standard
-
-  function openBreaksModal() {
-    playSound(popupSound);
-    modalBreaks.classList.add('is-open');
-  }
-  function closeBreaksModal() {
-    playSound(klickSound);
-    modalBreaks.classList.remove('is-open');
-  }
-
-  cardBreaks.addEventListener('click', openBreaksModal);
-  btnStepsOpen.addEventListener('click', openBreaksModal);
-  btnCloseBreaks.addEventListener('click', closeBreaksModal);
-
-  stepBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
+  // 5 Stepped Stop Click Listeners inside the Reader Modal
+  stepBlockItems.forEach(item => {
+    item.addEventListener('click', () => {
       playSound(klickSound);
-      stepBtns.forEach(b => b.classList.remove('is-active'));
-      btn.classList.add('is-active');
+      stepBlockItems.forEach(b => b.classList.remove('is-active'));
+      item.classList.add('is-active');
 
-      const step = btn.getAttribute('data-step');
-      const val = parseInt(btn.getAttribute('data-val'), 10);
+      const val = parseInt(item.getAttribute('data-val'), 10);
       currentBreakFrequency = val;
 
-      const name = btn.querySelector('.step-name').textContent;
-      breaksCardSub.textContent = `${name} (Step ${step})`;
-
-      if (currentParsedData) {
-        recalculateAndRender();
-      }
+      recalculateAndRender();
     });
   });
 
-  // Divider style selection
-  const dividerSelect = document.getElementById('divider-select');
-  const customDividerWrapper = document.getElementById('custom-divider-wrapper');
-  const customDividerInput = document.getElementById('custom-divider-input');
-
+  // Divider format change
   dividerSelect.addEventListener('change', () => {
     playSound(klickSound);
     if (dividerSelect.value === 'custom') {
@@ -181,129 +269,13 @@ document.addEventListener('DOMContentLoaded', () => {
     renderLivePreview();
   });
 
-  // Card 5: Metadata Modal
-  const cardMeta = document.getElementById('card-meta');
-  const modalMeta = document.getElementById('modal-meta');
-  const btnCloseMeta = document.getElementById('btn-close-meta');
-  const titleInput = document.getElementById('book-title-input');
-  const authorInput = document.getElementById('book-author-input');
-  const filenameInput = document.getElementById('output-filename-input');
-  const metaCardSub = document.getElementById('meta-card-sub');
-
-  function openMetaModal() {
-    playSound(popupSound);
-    modalMeta.classList.add('is-open');
-  }
-  function closeMetaModal() {
-    playSound(klickSound);
-    modalMeta.classList.remove('is-open');
-    renderLivePreview();
-  }
-
-  cardMeta.addEventListener('click', openMetaModal);
-  btnCloseMeta.addEventListener('click', closeMetaModal);
-
+  // Metadata input changes live inside Reader Modal
   titleInput.addEventListener('input', () => {
-    metaCardSub.textContent = titleInput.value ? titleInput.value.slice(0, 16) + '...' : 'Edit Details';
+    bookCardTitle.textContent = titleInput.value ? titleInput.value.slice(0, 16) + '...' : 'Book Notes';
+    readerModalTitleText.textContent = titleInput.value || 'Book Reader';
     renderLivePreview();
   });
   authorInput.addEventListener('input', renderLivePreview);
-
-  // Close modals on overlay backdrop click
-  [modalReader, modalBreaks, modalMeta].forEach(modal => {
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) {
-        modal.classList.remove('is-open');
-        playSound(klickSound);
-      }
-    });
-  });
-
-  // State Management
-  let currentParsedData = null;
-  let currentCoverData = null;
-  let currentCoverMime = null;
-  let structuredBlocks = [];
-
-  // DOM Preview & Stats elements
-  const readerEmpty = document.getElementById('reader-empty');
-  const readerLive = document.getElementById('reader-live');
-  const previewTitle = document.getElementById('preview-title');
-  const previewAuthor = document.getElementById('preview-author');
-  const previewBlocks = document.getElementById('preview-blocks');
-  const readerCardTitle = document.getElementById('reader-card-title');
-  const readerCardSub = document.getElementById('reader-card-sub');
-
-  const statAnnotations = document.getElementById('stat-annotations');
-  const statPages = document.getElementById('stat-pages');
-  const statWords = document.getElementById('stat-words');
-
-  const btnEpub = document.getElementById('btn-epub');
-  const btnPdf = document.getElementById('btn-pdf');
-  const btnReset = document.getElementById('btn-reset');
-
-  function handleEmlFile(file) {
-    emlSubtext.textContent = file.name.slice(0, 16) + '...';
-    cardEml.classList.add('is-loaded');
-    playSound(newsSound);
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      processEml(e.target.result);
-    };
-    reader.readAsText(file);
-  }
-
-  function handleCoverFile(file) {
-    playSound(popupSound);
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      currentCoverData = e.target.result;
-      currentCoverMime = file.type || 'image/jpeg';
-      coverThumb.src = currentCoverData;
-      coverThumb.style.display = 'block';
-      coverIcon.style.display = 'none';
-      coverTitleText.textContent = 'Cover Attached';
-      coverSubtext.textContent = file.name.slice(0, 14);
-      cardCover.classList.add('is-loaded');
-    };
-    reader.readAsDataURL(file);
-  }
-
-  function processEml(rawEml) {
-    try {
-      const parsed = window.EMLParser.parseEmlNotes(rawEml);
-      currentParsedData = parsed;
-
-      const safeTitle = (parsed.title || 'book-notes')
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/^-+|-+$/g, '');
-
-      titleInput.value = parsed.title || '';
-      authorInput.value = parsed.author || '';
-      filenameInput.value = safeTitle || 'notes';
-
-      readerCardTitle.textContent = (parsed.title || 'Book Reader').slice(0, 16) + '...';
-      readerCardSub.textContent = `${parsed.annotations.length} highlights`;
-
-      const totalWords = parsed.annotations.reduce((acc, curr) => {
-        const words = (curr.text + ' ' + curr.note).trim().split(/\s+/).filter(Boolean).length;
-        return acc + words;
-      }, 0);
-
-      statAnnotations.textContent = `${parsed.annotations.length} highlights`;
-      statWords.textContent = `${totalWords.toLocaleString()} words`;
-
-      recalculateAndRender();
-
-      // Enable EPUB and PDF buttons
-      btnEpub.classList.remove('disabled');
-      btnPdf.classList.remove('disabled');
-    } catch (err) {
-      console.error(err);
-      alert('Could not parse .eml file. Please verify it is a valid Apple Books export.');
-    }
-  }
 
   function recalculateAndRender() {
     if (!currentParsedData) return;
@@ -314,7 +286,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     const totalPages = structuredBlocks.filter(b => b.type === 'page-break').length || 1;
-    statPages.textContent = `${totalPages} pages`;
+    const totalWords = currentParsedData.annotations.reduce((acc, curr) => {
+      const words = (curr.text + ' ' + curr.note).trim().split(/\s+/).filter(Boolean).length;
+      return acc + words;
+    }, 0);
+
+    footerStats.textContent = `${currentParsedData.annotations.length} highlights • ${totalPages} pages • ${totalWords.toLocaleString()} words`;
 
     renderLivePreview();
   }
@@ -331,9 +308,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function renderLivePreview() {
     if (!currentParsedData) return;
-
-    readerEmpty.style.display = 'none';
-    readerLive.style.display = 'block';
 
     previewTitle.textContent = titleInput.value || 'Untitled Notes';
     previewAuthor.textContent = authorInput.value ? `by ${authorInput.value}` : '';
@@ -366,7 +340,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Reset Studio
+  // Reset Studio Button
   btnReset.addEventListener('click', () => {
     playSound(homeSound);
     currentParsedData = null;
@@ -374,32 +348,29 @@ document.addEventListener('DOMContentLoaded', () => {
     currentCoverMime = null;
     structuredBlocks = [];
 
-    emlSubtext.textContent = 'Click or Drop file';
-    cardEml.classList.remove('is-loaded');
+    // Reset Carousel to Initial Single Card
+    cardEml.style.display = 'flex';
+    cardBook.style.display = 'none';
+    cardCover.style.display = 'none';
+    cardChangeFile.style.display = 'none';
+
+    selectCard(cardEml);
 
     coverThumb.style.display = 'none';
     coverIcon.style.display = 'block';
     coverTitleText.textContent = 'Cover Image';
-    coverSubtext.textContent = 'PNG, JPG, WEBP';
+    coverSubtext.textContent = 'Optional Art';
     cardCover.classList.remove('is-loaded');
-
-    readerCardTitle.textContent = 'Book Reader';
-    readerCardSub.textContent = 'Click to Open';
 
     titleInput.value = '';
     authorInput.value = '';
     filenameInput.value = '';
-    metaCardSub.textContent = 'Edit Details';
-
-    statAnnotations.textContent = '0 highlights';
-    statPages.textContent = '0 pages';
-    statWords.textContent = '0 words';
-
-    readerEmpty.style.display = 'block';
-    readerLive.style.display = 'none';
 
     btnEpub.classList.add('disabled');
     btnPdf.classList.add('disabled');
+    btnRead.classList.add('disabled');
+
+    footerStats.textContent = 'Awaiting Apple Books export cartridge';
   });
 
   // Export EPUB
@@ -445,7 +416,7 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       const filename = (filenameInput.value || 'book-notes').replace(/\.pdf$/i, '') + '.pdf';
       await window.PDFGenerator.generatePdf({
-        element: readerLive,
+        element: document.getElementById('reader-book-container'),
         filename: filename
       });
     } catch (err) {

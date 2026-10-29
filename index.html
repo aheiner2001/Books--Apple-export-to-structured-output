@@ -12,8 +12,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
 /* ==========================================================================
-   NINTENDO SWITCH WEB UI 10/10 REVISION (Pure White Console Edition)
-   Combines authentic Switch OS components with seamless Books Notes Converter
+   NINTENDO SWITCH WEB UI - FINAL CLEAN INTEGRATION (Pure White Console)
    ========================================================================== */
 
 ::-webkit-scrollbar {
@@ -22,7 +21,7 @@
   height: 6px;
 }
 ::-webkit-scrollbar-thumb {
-  background: #d8d8d8;
+  background: #d4d4d4;
   border-radius: 4px;
 }
 
@@ -48,24 +47,24 @@ body {
   align-items: center;
 }
 
-/* Authentic Nintendo Switch Pulse Border Animation (from nintendo-switch-web-ui) */
+/* Authentic Switch Pulsing Glow Animation */
 @keyframes switchBorderPulse {
-  0% { border-color: #62EFDF; box-shadow: 0 0 12px rgba(98, 239, 223, 0.6); }
-  50% { border-color: #1b98c6; box-shadow: 0 0 16px rgba(27, 152, 198, 0.7); }
-  100% { border-color: #62EFDF; box-shadow: 0 0 12px rgba(98, 239, 223, 0.6); }
+  0% { border-color: #62EFDF; box-shadow: 0 0 14px rgba(98, 239, 223, 0.6); }
+  50% { border-color: #1b98c6; box-shadow: 0 0 18px rgba(27, 152, 198, 0.7); }
+  100% { border-color: #62EFDF; box-shadow: 0 0 14px rgba(98, 239, 223, 0.6); }
 }
 
-.switch-console-screen {
+.switch-viewport {
   width: 100vw;
   height: 100vh;
   background: #ffffff;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 2.2vh 3.5vw 2.5vh;
+  padding: 2.5vh 4vw 2.5vh;
 }
 
-/* 1. TOP ROW: Profile & System Status */
+/* 1. TOP ROW: Profile & Status */
 .switch-top-row {
   display: flex;
   justify-content: space-between;
@@ -80,30 +79,30 @@ body {
   cursor: pointer;
 }
 
-.switch-profile-avatar {
-  width: 50px;
-  height: 50px;
+.switch-avatar {
+  width: 52px;
+  height: 52px;
   border-radius: 50%;
   border: 3px solid #504F4E;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
   overflow: hidden;
   background: #0885a5;
   transition: transform 0.15s ease, border-color 0.15s ease;
 }
 
-.switch-profile-avatar img {
+.switch-avatar img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.switch-profile-avatar:hover {
+.switch-avatar:hover {
   transform: scale(1.08);
   border-color: #3db4ad;
 }
 
 .switch-profile-name {
-  font-size: 1.15rem;
+  font-size: 1.2rem;
   font-weight: 500;
   color: #333;
 }
@@ -111,59 +110,57 @@ body {
 .switch-status-tray {
   display: flex;
   align-items: center;
-  gap: 1.4vw;
+  gap: 1.5vw;
   font-size: 1.3rem;
   font-weight: 500;
   color: #444;
 }
 
-.switch-status-tray svg,
 .switch-status-tray i {
   color: #444;
 }
 
-/* 2. ACTIVE SELECTION TITLE (from nintendo-switch-web-ui) */
+/* 2. ACTIVE SELECTION TITLE BANNER */
 .switch-active-title-wrap {
-  height: 5vh;
+  height: 5.5vh;
   margin-top: 1vh;
-  padding-left: 0.5vw;
+  text-align: center;
 }
 
 .switch-active-title {
-  font-size: 1.55rem;
+  font-size: 1.65rem;
   font-weight: 600;
   color: #0885a5;
   letter-spacing: 0.5px;
 }
 
-/* 3. CENTER CAROUSEL (Game Cards) */
+/* 3. CENTER CAROUSEL (Game Cards) - Centered with plenty of padding so borders never cut off */
 .switch-carousel-container {
   width: 100%;
-  height: 40vh;
+  height: 42vh;
   display: flex;
   align-items: center;
-  overflow-x: auto;
-  overflow-y: hidden;
-  padding: 1.5vh 0.5vw;
-  gap: 1.8vw;
+  justify-content: center; /* Always centered */
+  gap: 3vw;
+  padding: 3vh 3vw;
+  overflow: visible; /* Never clips glowing pulse borders */
 }
 
 .switch-card {
   position: relative;
-  width: 25vh;
-  height: 25vh;
-  min-width: 25vh;
-  border-radius: 6px;
-  background: #fbfbfb;
+  width: 27vh;
+  height: 27vh;
+  border-radius: 8px;
+  background: #fcfcfc;
   border: 3px solid #ffffff;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
   cursor: pointer;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   text-align: center;
-  padding: 16px;
+  padding: 18px;
   transition: transform 0.18s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
@@ -178,32 +175,32 @@ body {
 }
 
 .card-icon {
-  font-size: 3.2rem;
+  font-size: 3.6rem;
   color: #0885a5;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .card-title {
-  font-size: 1.05rem;
+  font-size: 1.15rem;
   font-weight: 600;
   color: #222;
   margin-bottom: 4px;
 }
 
 .card-subtitle {
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   color: #777;
 }
 
 .card-badge {
   position: absolute;
-  top: 8px;
-  right: 8px;
+  top: 10px;
+  right: 10px;
   background: #3db4ad;
   color: #fff;
-  font-size: 0.65rem;
+  font-size: 0.7rem;
   font-weight: 700;
-  padding: 2px 6px;
+  padding: 3px 7px;
   border-radius: 4px;
   display: none;
 }
@@ -212,23 +209,22 @@ body {
   display: block;
 }
 
-/* Hidden File Inputs */
 .file-hidden {
   display: none;
 }
 
-/* 4. CIRCULAR OPTION BUTTONS (Album, Controllers, Settings, etc.) */
+/* 4. CIRCULAR OPTION BUTTONS */
 .switch-options-row {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 2vw;
+  gap: 2.5vw;
   height: 10vh;
 }
 
 .switch-circle-btn {
-  width: 58px;
-  height: 58px;
+  width: 62px;
+  height: 62px;
   border-radius: 50%;
   background: #ffffff;
   border: 1px solid #d4d4d4;
@@ -252,7 +248,6 @@ body {
   pointer-events: none;
 }
 
-.switch-circle-btn svg,
 .switch-circle-btn i {
   font-size: 26px;
   color: #444;
@@ -261,7 +256,7 @@ body {
 .switch-circle-btn .btn-tooltip {
   display: none;
   position: absolute;
-  bottom: -28px;
+  bottom: -30px;
   left: 50%;
   transform: translateX(-50%);
   white-space: nowrap;
@@ -274,14 +269,13 @@ body {
   display: block;
 }
 
-/* 5. FOOTER & CONTROLLER PROMPTS */
+/* 5. FOOTER: Ultra Clean Statistics */
 .switch-footer-row {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-  height: 6vh;
+  height: 5vh;
   border-top: 1px solid #333333;
-  padding-top: 1vh;
 }
 
 .footer-stats-text {
@@ -291,43 +285,17 @@ body {
   letter-spacing: 0.5px;
 }
 
-.footer-controller-prompts {
-  display: flex;
-  align-items: center;
-  gap: 28px;
-}
-
-.switch-prompt {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 1.05rem;
-  font-weight: 500;
-  color: #333;
-}
-
-.switch-btn-icon {
-  width: 26px;
-  height: 26px;
-  border: 1.5px solid #333;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.85rem;
-  font-weight: 700;
-  background: #ffffff;
-}
-
 /* ==========================================================================
-   MODAL DIALOGS (Reader Strip, Break Steps, Metadata)
+   LIVE BOOK READER MODAL - Side-by-Side Split View
+   Center: Live Book Content
+   Side Panel: 5 Discrete Break Stops + Metadata Controls
    ========================================================================== */
 .modal-overlay {
   display: none;
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(3px);
+  backdrop-filter: blur(4px);
   z-index: 100;
   justify-content: center;
   align-items: center;
@@ -337,136 +305,94 @@ body {
   display: flex;
 }
 
-.modal-card {
+.reader-split-modal {
   background: #ffffff;
   border: 4px solid #3db4ad;
   border-radius: 12px;
-  width: 92%;
-  max-width: 640px;
-  max-height: 85vh;
+  width: 95vw;
+  max-width: 1200px;
+  height: 88vh;
   display: flex;
   flex-direction: column;
-  padding: 24px 28px;
-  box-shadow: 0 16px 40px rgba(0,0,0,0.3);
+  padding: 20px 24px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.35);
 }
 
-.modal-header {
+.reader-modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
   padding-bottom: 12px;
   border-bottom: 1px solid #eee;
+  height: 50px;
 }
 
-.modal-title {
+.reader-modal-title {
   font-size: 1.35rem;
   font-weight: 700;
   color: #0885a5;
-}
-
-.modal-body {
-  overflow-y: auto;
-  flex: 1;
-}
-
-.btn-modal-close {
-  padding: 10px 18px;
-  background: #2c2c2c;
-  color: #ffffff;
-  border: none;
-  border-radius: 6px;
-  font-size: 0.95rem;
-  font-weight: 600;
-  cursor: pointer;
-  margin-top: 16px;
-  align-self: flex-end;
-}
-
-/* 5 Discrete Stepped Stops */
-.steps-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  display: flex;
+  align-items: center;
   gap: 10px;
-  margin: 16px 0 20px;
 }
 
-.step-btn {
-  background: #f7f7f7;
-  border: 2px solid #ddd;
-  border-radius: 8px;
-  padding: 12px 6px;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.15s ease;
+.reader-split-layout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 24px;
+  height: calc(100% - 60px);
+  padding-top: 16px;
+  overflow: hidden;
 }
 
-.step-btn:hover {
-  border-color: #3db4ad;
+/* Center Live Book Page */
+.reader-book-center {
   background: #ffffff;
-}
-
-.step-btn.is-active {
-  border-color: #0885a5;
-  background: #eef8fb;
-  box-shadow: 0 0 0 2px rgba(8, 133, 165, 0.25);
-}
-
-.step-number {
-  font-size: 1.15rem;
-  font-weight: 700;
-  color: #111;
-}
-
-.step-name {
-  font-size: 0.72rem;
-  color: #666;
-  margin-top: 4px;
-}
-
-/* Reader Typography Inside Modal */
-.book-paper-content {
-  font-family: Georgia, serif;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 36px 48px;
+  overflow-y: auto;
+  font-family: Georgia, Palatino, serif;
   color: #1a1a1a;
-  line-height: 1.75;
-  padding: 10px 16px;
+  box-shadow: inset 0 1px 4px rgba(0,0,0,0.03);
 }
 
 .book-h1 {
-  font-size: 1.8rem;
+  font-size: 2rem;
   font-weight: 700;
   text-align: center;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
 
 .book-auth {
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   color: #666;
   text-align: center;
-  margin-bottom: 18px;
+  margin-bottom: 24px;
 }
 
 .book-divider-line {
-  width: 40px;
+  width: 44px;
   height: 1px;
   background: #ccc;
-  margin: 14px auto 24px;
+  margin: 16px auto 30px;
   border: 0;
 }
 
 .book-p {
   font-size: 1.05rem;
+  line-height: 1.8;
   text-align: justify;
-  text-indent: 1.6em;
-  margin-bottom: 1.1em;
+  text-indent: 1.8em;
+  margin-bottom: 1.2em;
 }
 
 .book-note-card {
   font-family: "Roboto", sans-serif;
   background: #f8f8f8;
-  border-left: 3px solid #222;
-  padding: 10px 14px;
-  margin: 1.4em 0;
+  border-left: 3px solid #111;
+  padding: 12px 16px;
+  margin: 1.6em 0;
   font-style: italic;
   font-size: 0.95rem;
 }
@@ -475,8 +401,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  margin: 28px 0 20px;
+  gap: 14px;
+  margin: 32px 0 24px;
   font-size: 0.75rem;
   color: #888;
   text-transform: uppercase;
@@ -491,41 +417,126 @@ body {
   background: #eee;
 }
 
-.input-row {
+/* Side Control Panel inside Reader */
+.reader-side-panel {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  margin-bottom: 14px;
+  gap: 18px;
+  padding: 20px;
+  background: #fafafa;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  overflow-y: auto;
 }
 
-.input-row label {
-  font-size: 0.85rem;
+.side-section-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #0885a5;
+  margin-bottom: 6px;
+}
+
+/* 5 Stepped Stop Blocks */
+.side-steps-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.step-block-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 12px;
+  background: #ffffff;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.step-block-item:hover {
+  border-color: #3db4ad;
+}
+
+.step-block-item.is-active {
+  border-color: #0885a5;
+  background: #eef8fb;
+  box-shadow: 0 0 0 2px rgba(8, 133, 165, 0.2);
+}
+
+.step-badge {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #2c2c2c;
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.step-block-item.is-active .step-badge {
+  background: #0885a5;
+}
+
+.step-name-text {
+  font-size: 0.88rem;
   font-weight: 600;
-  color: #555;
+  color: #222;
 }
 
-.input-box {
-  font-size: 0.95rem;
-  padding: 8px 12px;
+.side-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.side-input-group label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #666;
+}
+
+.side-input-field {
+  padding: 8px 10px;
+  font-size: 0.88rem;
   border: 1px solid #ccc;
   border-radius: 6px;
   outline: none;
+  background: #fff;
 }
 
-.input-box:focus {
+.side-input-field:focus {
   border-color: #3db4ad;
+}
+
+.btn-reader-close {
+  padding: 10px;
+  background: #2c2c2c;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: auto;
 }
   </style>
 </head>
 <body>
 
-  <!-- Fullscreen Nintendo Switch Viewport -->
-  <main class="switch-console-screen">
+  <!-- Fullscreen Nintendo Switch Console Frame -->
+  <main class="switch-viewport">
     
-    <!-- 1. Top Row: Profile & Status Tray -->
+    <!-- 1. Top Status Row -->
     <header class="switch-top-row">
       <div class="switch-profiles" id="profile-btn">
-        <div class="switch-profile-avatar">
+        <div class="switch-avatar">
           <img src="./img/cuphead-logo.png" alt="Profile">
         </div>
         <span class="switch-profile-name">Aaron's Studio</span>
@@ -538,55 +549,50 @@ body {
       </div>
     </header>
 
-    <!-- 2. Active Selected Title -->
+    <!-- 2. Active Title Banner -->
     <div class="switch-active-title-wrap">
-      <h2 class="switch-active-title" id="active-title-banner">Apple Books Notes .eml</h2>
+      <h2 class="switch-active-title" id="active-title-banner">Insert Apple Books .eml Export</h2>
     </div>
 
-    <!-- 3. Horizontal Switch Carousel Cards -->
-    <section class="switch-carousel-container" id="carousel">
-      <!-- Card 1: EML Input -->
-      <div class="switch-card is-selected" id="card-eml" data-title="Apple Notes .eml Export">
-        <span class="card-badge" id="eml-badge">READY</span>
+    <!-- 3. Centered Switch Card Carousel -->
+    <section class="switch-carousel-container" id="carousel-container">
+      
+      <!-- Initial State: Single Centered Cartridge Dropzone -->
+      <div class="switch-card is-selected" id="card-eml" data-title="Insert Apple Books .eml Export">
+        <span class="card-badge" id="eml-badge">LOADED</span>
         <i class="card-icon fas fa-envelope-open-text"></i>
-        <h3 class="card-title">Insert .eml</h3>
+        <h3 class="card-title" id="card-eml-title">Insert .eml</h3>
         <p class="card-subtitle" id="eml-subtext">Click or Drop file</p>
         <input type="file" id="eml-file-input" class="file-hidden" accept=".eml,message/rfc822,text/plain">
       </div>
 
-      <!-- Card 2: Cover Art -->
-      <div class="switch-card" id="card-cover" data-title="Optional Book Cover">
-        <span class="card-badge" id="cover-badge">LOADED</span>
+      <!-- State 2: Unlocked Cards (Hidden initially until file is loaded) -->
+      <!-- Card: Loaded Book Game Card (Clicking opens Reader) -->
+      <div class="switch-card" id="card-book" style="display: none;" data-title="Read Book Notes">
+        <i class="card-icon fas fa-book-open"></i>
+        <h3 class="card-title" id="book-card-title">Book Notes</h3>
+        <p class="card-subtitle" id="book-card-sub">Click to Read</p>
+      </div>
+
+      <!-- Card: Cover Art Slot -->
+      <div class="switch-card" id="card-cover" style="display: none;" data-title="Customize Book Cover">
+        <span class="card-badge" id="cover-badge">COVER SET</span>
         <i class="card-icon fas fa-image" id="cover-icon"></i>
         <img id="cover-thumb" style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 4px;" alt="Cover">
         <h3 class="card-title" id="cover-title-text">Cover Image</h3>
-        <p class="card-subtitle" id="cover-subtext">PNG, JPG, WEBP</p>
+        <p class="card-subtitle" id="cover-subtext">Optional Art</p>
         <input type="file" id="cover-file-input" class="file-hidden" accept="image/png,image/jpeg,image/webp">
       </div>
 
-      <!-- Card 3: Live Reader Preview -->
-      <div class="switch-card" id="card-reader" data-title="Continuous Book Reader">
-        <i class="card-icon fas fa-book-open"></i>
-        <h3 class="card-title" id="reader-card-title">Book Reader</h3>
-        <p class="card-subtitle" id="reader-card-sub">Click to Open</p>
-      </div>
-
-      <!-- Card 4: Break Frequency Steps -->
-      <div class="switch-card" id="card-breaks" data-title="Paragraph Break Frequency">
-        <i class="card-icon fas fa-sliders"></i>
-        <h3 class="card-title">Break Steps</h3>
-        <p class="card-subtitle" id="breaks-card-sub">Standard (Step 3)</p>
-      </div>
-
-      <!-- Card 5: Book Metadata -->
-      <div class="switch-card" id="card-meta" data-title="Book Information & Title">
-        <i class="card-icon fas fa-pen-nib"></i>
-        <h3 class="card-title">Metadata</h3>
-        <p class="card-subtitle" id="meta-card-sub">Edit Details</p>
+      <!-- Card: Change / Eject File Slot -->
+      <div class="switch-card" id="card-change-file" style="display: none;" data-title="Change .eml Export File">
+        <i class="card-icon fas fa-folder-open"></i>
+        <h3 class="card-title">Change File</h3>
+        <p class="card-subtitle">Choose Another Book</p>
       </div>
     </section>
 
-    <!-- 4. Circular Option Buttons -->
+    <!-- 4. Clean Switch Circular Buttons (Only 4 distinct actions) -->
     <div class="switch-options-row">
       <div class="switch-circle-btn disabled" id="btn-epub" title="Export EPUB for Apple Books">
         <i class="fas fa-file-arrow-down" style="color: #d54f53;"></i>
@@ -598,135 +604,105 @@ body {
         <span class="btn-tooltip">Download PDF</span>
       </div>
 
-      <div class="switch-circle-btn" id="btn-reader-open" title="Open Live Reader">
+      <div class="switch-circle-btn disabled" id="btn-read" title="Open Fullscreen Reader">
         <i class="fas fa-book-open" style="color: #276bda;"></i>
         <span class="btn-tooltip">Read Notes</span>
       </div>
 
-      <div class="switch-circle-btn" id="btn-steps-open" title="Adjust Break Stops">
-        <i class="fas fa-sliders" style="color: #aa2eb2;"></i>
-        <span class="btn-tooltip">Paragraph Stops</span>
-      </div>
-
-      <div class="switch-circle-btn" id="btn-reset" title="Reset All">
+      <div class="switch-circle-btn" id="btn-reset" title="Eject / Reset">
         <i class="fas fa-rotate-left" style="color: #6a6367;"></i>
         <span class="btn-tooltip">Reset</span>
       </div>
     </div>
 
-    <!-- 5. Footer with Statistics & Start Button Prompt -->
+    <!-- 5. Footer: Clean Statistics (A Start/Export prompt removed) -->
     <footer class="switch-footer-row">
-      <div class="footer-stats-text">
-        <span id="stat-annotations">0 highlights</span> &bull; 
-        <span id="stat-pages">0 pages</span> &bull; 
-        <span id="stat-words">0 words</span>
-      </div>
-
-      <div class="footer-controller-prompts">
-        <div class="switch-prompt">
-          <div class="switch-btn-icon">A</div>
-          <span>Start / Export</span>
-        </div>
+      <div class="footer-stats-text" id="footer-stats">
+        Awaiting Apple Books export cartridge
       </div>
     </footer>
   </main>
 
-  <!-- MODAL 1: Live Book Reader -->
+  <!-- SPLIT READER MODAL: Center Live Reader + Side Controls for Break Stops & Metadata -->
   <div class="modal-overlay" id="modal-reader">
-    <div class="modal-card" style="max-width: 780px;">
-      <div class="modal-header">
-        <h2 class="modal-title"><i class="fas fa-book-open"></i> Live Book Preview</h2>
+    <div class="reader-split-modal">
+      <div class="reader-modal-header">
+        <h2 class="reader-modal-title"><i class="fas fa-book-open"></i> <span id="reader-modal-title-text">Live Book Reader</span></h2>
         <span style="font-size: 0.85rem; color: #777;">Chronological &bull; Dates Removed</span>
       </div>
-      <div class="modal-body book-paper-content" id="reader-body">
-        <div id="reader-empty" style="text-align: center; color: #888; padding: 40px 10px;">
-          <p>No notes loaded yet. Drop or select your .eml file on the Home Screen.</p>
-        </div>
-        <div id="reader-live" style="display: none;">
+
+      <div class="reader-split-layout">
+        <!-- Center: Live Book Paper -->
+        <div class="reader-book-center" id="reader-book-container">
           <h1 id="preview-title" class="book-h1"></h1>
           <p id="preview-author" class="book-auth"></p>
           <hr class="book-divider-line">
           <div id="preview-blocks"></div>
         </div>
-      </div>
-      <button type="button" class="btn-modal-close" id="btn-close-reader">Close</button>
-    </div>
-  </div>
 
-  <!-- MODAL 2: 5 Discrete Break Steps & Divider Style -->
-  <div class="modal-overlay" id="modal-breaks">
-    <div class="modal-card">
-      <div class="modal-header">
-        <h2 class="modal-title"><i class="fas fa-sliders"></i> Paragraph Break Frequency</h2>
-      </div>
-      <div class="modal-body">
-        <p style="font-size: 0.88rem; color: #555;">Select one of 5 discrete paragraph break levels:</p>
+        <!-- Side Control Panel: 5 Break Stops & Metadata -->
+        <aside class="reader-side-panel">
+          <div>
+            <h4 class="side-section-title">Paragraph Breaks (5 Steps)</h4>
+            <div class="side-steps-container">
+              <div class="step-block-item" data-step="1" data-val="0">
+                <span class="step-badge">1</span>
+                <span class="step-name-text">Continuous</span>
+              </div>
+              <div class="step-block-item" data-step="2" data-val="25">
+                <span class="step-badge">2</span>
+                <span class="step-name-text">Long</span>
+              </div>
+              <div class="step-block-item is-active" data-step="3" data-val="50">
+                <span class="step-badge">3</span>
+                <span class="step-name-text">Standard</span>
+              </div>
+              <div class="step-block-item" data-step="4" data-val="75">
+                <span class="step-badge">4</span>
+                <span class="step-name-text">Frequent</span>
+              </div>
+              <div class="step-block-item" data-step="5" data-val="100">
+                <span class="step-badge">5</span>
+                <span class="step-name-text">Every Note</span>
+              </div>
+            </div>
+          </div>
 
-        <div class="steps-grid">
-          <button type="button" class="step-btn" data-step="1" data-val="0">
-            <div class="step-number">1</div>
-            <div class="step-name">Continuous</div>
-          </button>
-          <button type="button" class="step-btn" data-step="2" data-val="25">
-            <div class="step-number">2</div>
-            <div class="step-name">Long</div>
-          </button>
-          <button type="button" class="step-btn is-active" data-step="3" data-val="50">
-            <div class="step-number">3</div>
-            <div class="step-name">Standard</div>
-          </button>
-          <button type="button" class="step-btn" data-step="4" data-val="75">
-            <div class="step-number">4</div>
-            <div class="step-name">Frequent</div>
-          </button>
-          <button type="button" class="step-btn" data-step="5" data-val="100">
-            <div class="step-number">5</div>
-            <div class="step-name">Every Note</div>
-          </button>
-        </div>
+          <div class="side-input-group">
+            <label for="divider-select">Divider Format</label>
+            <select id="divider-select" class="side-input-field">
+              <option value="Page">Page (Page 1, Page 2...)</option>
+              <option value="Chapter">Chapter (Chapter 1, Chapter 2...)</option>
+              <option value="Section">Section (Section 1, Section 2...)</option>
+              <option value="Part">Part (Part 1, Part 2...)</option>
+              <option value="custom">Custom Prefix...</option>
+              <option value="none">Nothing / Plain Line</option>
+            </select>
+          </div>
 
-        <div class="input-row">
-          <label for="divider-select">Divider Heading Format</label>
-          <select id="divider-select" class="input-box">
-            <option value="Page">Page (Page 1, Page 2...)</option>
-            <option value="Chapter">Chapter (Chapter 1, Chapter 2...)</option>
-            <option value="Section">Section (Section 1, Section 2...)</option>
-            <option value="Part">Part (Part 1, Part 2...)</option>
-            <option value="custom">Custom Prefix...</option>
-            <option value="none">Nothing / Plain Line</option>
-          </select>
-        </div>
+          <div id="custom-divider-wrapper" class="side-input-group" style="display: none;">
+            <label for="custom-divider-input">Custom Prefix</label>
+            <input type="text" id="custom-divider-input" class="side-input-field" placeholder="e.g. Note or Segment">
+          </div>
 
-        <div id="custom-divider-wrapper" class="input-row" style="display: none;">
-          <label for="custom-divider-input">Custom Prefix Label</label>
-          <input type="text" id="custom-divider-input" class="input-box" placeholder="e.g. Note or Segment">
-        </div>
-      </div>
-      <button type="button" class="btn-modal-close" id="btn-close-breaks">Done</button>
-    </div>
-  </div>
+          <div class="side-input-group">
+            <label for="book-title-input">Book Title</label>
+            <input type="text" id="book-title-input" class="side-input-field" placeholder="Title">
+          </div>
 
-  <!-- MODAL 3: Book Metadata Details -->
-  <div class="modal-overlay" id="modal-meta">
-    <div class="modal-card">
-      <div class="modal-header">
-        <h2 class="modal-title"><i class="fas fa-pen-nib"></i> Book Information</h2>
+          <div class="side-input-group">
+            <label for="book-author-input">Author</label>
+            <input type="text" id="book-author-input" class="side-input-field" placeholder="Author">
+          </div>
+
+          <div class="side-input-group">
+            <label for="output-filename-input">Output Filename</label>
+            <input type="text" id="output-filename-input" class="side-input-field" placeholder="filename">
+          </div>
+
+          <button type="button" class="btn-reader-close" id="btn-close-reader">Done</button>
+        </aside>
       </div>
-      <div class="modal-body">
-        <div class="input-row">
-          <label for="book-title-input">Book Title</label>
-          <input type="text" id="book-title-input" class="input-box" placeholder="Title">
-        </div>
-        <div class="input-row">
-          <label for="book-author-input">Author Name</label>
-          <input type="text" id="book-author-input" class="input-box" placeholder="Author">
-        </div>
-        <div class="input-row">
-          <label for="output-filename-input">Output Filename</label>
-          <input type="text" id="output-filename-input" class="input-box" placeholder="filename">
-        </div>
-      </div>
-      <button type="button" class="btn-modal-close" id="btn-close-meta">Done</button>
     </div>
   </div>
 
