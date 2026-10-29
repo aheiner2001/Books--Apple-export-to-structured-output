@@ -18,6 +18,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const breakIntervalSlider = document.getElementById('break-interval-slider');
   const sliderIntervalLabel = document.getElementById('slider-interval-label');
 
+  const dividerStyleSelect = document.getElementById('divider-style-select');
+  const customDividerWrapper = document.getElementById('custom-divider-wrapper');
+  const customDividerInput = document.getElementById('custom-divider-input');
+
   const titleInput = document.getElementById('book-title-input');
   const authorInput = document.getElementById('book-author-input');
   const filenameInput = document.getElementById('output-filename-input');
@@ -153,6 +157,32 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // Divider Style selection (Page, Chapter, Section, Custom, None)
+  dividerStyleSelect.addEventListener('change', () => {
+    if (dividerStyleSelect.value === 'custom') {
+      customDividerWrapper.style.display = 'flex';
+    } else {
+      customDividerWrapper.style.display = 'none';
+    }
+    renderLivePreview();
+  });
+
+  customDividerInput.addEventListener('input', () => {
+    renderLivePreview();
+  });
+
+  function getDividerLabelText(pageNumber) {
+    const style = dividerStyleSelect.value;
+    if (style === 'none') {
+      return '';
+    }
+    if (style === 'custom') {
+      const customPrefix = (customDividerInput.value || '').trim();
+      return customPrefix ? `${customPrefix} ${pageNumber}` : `${pageNumber}`;
+    }
+    return `${style} ${pageNumber}`;
+  }
+
   function recalculateAndRender() {
     if (!currentParsedData) return;
 
@@ -218,7 +248,13 @@ document.addEventListener('DOMContentLoaded', () => {
       if (block.type === 'page-break') {
         const div = document.createElement('div');
         div.className = 'book-page-marker';
-        div.textContent = `Page ${block.pageNumber}`;
+        const labelText = getDividerLabelText(block.pageNumber);
+        if (labelText) {
+          div.textContent = labelText;
+        } else {
+          div.style.fontSize = '0';
+          div.innerHTML = '&nbsp;';
+        }
         previewBodyBlocks.appendChild(div);
       } else if (block.type === 'prose') {
         const p = document.createElement('p');
@@ -277,7 +313,9 @@ document.addEventListener('DOMContentLoaded', () => {
         author: authorInput.value || 'Unknown',
         blocks: structuredBlocks,
         coverData: currentCoverData,
-        coverMime: currentCoverMime
+        coverMime: currentCoverMime,
+        dividerLabel: dividerStyleSelect.value,
+        customDividerText: customDividerInput.value
       });
 
       const url = URL.createObjectURL(blob);

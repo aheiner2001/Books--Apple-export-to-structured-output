@@ -48,6 +48,7 @@
     const coverData = options.coverData;
     const coverMime = options.coverMime || 'image/jpeg';
     const hasCover = Boolean(coverData);
+    const dividerLabel = typeof options.dividerLabel !== 'undefined' ? options.dividerLabel : 'Page';
 
     const zip = new JSZip();
 
@@ -172,7 +173,13 @@ p.prose-paragraph {
     for (const block of blocks) {
       if (block.type === 'page-break') {
         if (block.pageNumber > 1) {
-          bodyHtml += `<div class="page-marker">Page ${block.pageNumber}</div>\n`;
+          if (dividerLabel === 'none') {
+            bodyHtml += `<div class="page-marker" style="font-size:0;">&nbsp;</div>\n`;
+          } else {
+            const prefix = dividerLabel === 'custom' ? (options.customDividerText || '') : (dividerLabel || 'Page');
+            const text = prefix ? `${prefix} ${block.pageNumber}` : `${block.pageNumber}`;
+            bodyHtml += `<div class="page-marker">${escapeXml(text)}</div>\n`;
+          }
         }
       } else if (block.type === 'prose') {
         bodyHtml += `<p class="prose-paragraph">${escapeXml(block.content)}</p>\n`;

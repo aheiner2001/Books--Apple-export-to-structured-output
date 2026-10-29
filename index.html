@@ -21,7 +21,6 @@
       </div>
       <div class="switch-status-toolbar">
         <span id="switch-clock">12:00 PM</span>
-        <!-- Minimal Wifi and Battery Icons -->
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M5 12.55a11 11 0 0 1 14.08 0"></path>
           <path d="M1.42 9a16 16 0 0 1 21.16 0"></path>
@@ -92,7 +91,26 @@
           </div>
         </div>
 
-        <!-- Tile 4: Metadata Inputs -->
+        <!-- Tile 4: Custom Page/Section/Chapter Divider Label Selector -->
+        <div class="control-card">
+          <span class="control-heading">Divider Style</span>
+          <div class="switch-input-group">
+            <select id="divider-style-select" class="switch-input-field">
+              <option value="Page">Page (Page 1, Page 2...)</option>
+              <option value="Chapter">Chapter (Chapter 1, Chapter 2...)</option>
+              <option value="Section">Section (Section 1, Section 2...)</option>
+              <option value="Part">Part (Part 1, Part 2...)</option>
+              <option value="custom">Custom Text...</option>
+              <option value="none">Nothing / Plain Line</option>
+            </select>
+          </div>
+          <div id="custom-divider-wrapper" class="switch-input-group" style="display: none; margin-top: 4px;">
+            <label for="custom-divider-input">Custom Prefix</label>
+            <input type="text" id="custom-divider-input" class="switch-input-field" placeholder="e.g. Note or Segment">
+          </div>
+        </div>
+
+        <!-- Tile 5: Metadata Inputs -->
         <div class="control-card">
           <span class="control-heading">Cartridge Details</span>
           <div class="switch-input-group">
