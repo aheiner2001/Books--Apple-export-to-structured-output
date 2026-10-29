@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apple Books Notes Converter</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- External dependencies for in-browser client-side EPUB and PDF generation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Apple Books Notes Converter</h1>
+      <p>Transform your exported Apple Books notes into clean, continuous EPUB and PDF books.</p>
+    </header>
+
+    <div class="main-layout">
+      <!-- Left sidebar: controls, inputs, actions -->
+      <aside class="controls-card">
+        <!-- Step 1: Upload EML -->
+        <div class="section-block">
+          <h2 class="section-title">1. Upload Apple Books Export</h2>
+          <div class="dropzone" id="eml-dropzone">
+            <span class="icon">📖</span>
+            <p id="eml-drop-label">Choose or drop .eml file here</p>
+            <span class="sub-text">From Apple Books Export Email</span>
+            <input type="file" id="eml-file-input" class="file-input" accept=".eml,message/rfc822,text/plain">
+          </div>
+        </div>
+
+        <!-- Step 2: Custom Cover -->
+        <div class="section-block">
+          <h2 class="section-title">2. Book Cover (Optional)</h2>
+          <div class="dropzone" id="cover-dropzone">
+            <span class="icon">🖼️</span>
+            <p id="cover-drop-label">Choose or drop book cover</p>
+            <span class="sub-text">PNG, JPG, or WEBP</span>
+            <input type="file" id="cover-file-input" class="file-input" accept="image/png,image/jpeg,image/webp">
+          </div>
+          <div id="cover-preview-container" class="cover-preview-wrapper" style="display: none; margin-top: 10px;">
+            <img id="cover-img-preview" class="cover-thumbnail" alt="Cover Preview">
+            <div>
+              <p style="font-size: 0.85rem; font-weight: 600;">Custom Cover Loaded</p>
+              <button type="button" id="btn-remove-cover" class="btn-remove-cover">Remove Cover</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 3: Book Details -->
+        <div class="section-block">
+          <h2 class="section-title">3. Book Information</h2>
+          <div class="form-group">
+            <label for="book-title-input">Book Title</label>
+            <input type="text" id="book-title-input" class="form-control" placeholder="Extracted Title">
+          </div>
+          <div class="form-group" style="margin-top: 12px;">
+            <label for="book-author-input">Author</label>
+            <input type="text" id="book-author-input" class="form-control" placeholder="Extracted Author">
+          </div>
+          <div class="form-group" style="margin-top: 12px;">
+            <label for="output-filename-input">Output Filename</label>
+            <input type="text" id="output-filename-input" class="form-control" placeholder="book-notes">
+          </div>
+        </div>
+
+        <!-- Stats -->
+        <div id="stats-box" class="stats-badge" style="display: none;">
+          <span id="stat-annotations">0 highlights</span>
+          <span id="stat-words">0 words</span>
+        </div>
+
+        <!-- Step 4: Export Buttons -->
+        <div class="btn-group">
+          <button id="btn-download-epub" class="btn btn-primary" disabled>
+            <span>📱</span> Download EPUB (Apple Books)
+          </button>
+          <button id="btn-download-pdf" class="btn btn-secondary" disabled>
+            <span>📄</span> Download PDF
+          </button>
+        </div>
+      </aside>
+
+      <!-- Right column: Live Book Preview -->
+      <main class="preview-card">
+        <div class="preview-header">
+          <h2>Continuous Reader Preview</h2>
+          <span class="preview-tag">Dates Stripped &bull; Chronological Order</span>
+        </div>
+
+        <div id="book-paper" class="book-paper">
+          <div id="empty-state" class="empty-state">
+            <span class="icon">📚</span>
+            <h3>No file uploaded yet</h3>
+            <p>Upload an Apple Books exported .eml file on the left to see the continuous book preview here.</p>
+          </div>
+
+          <div id="book-content" style="display: none;">
+            <!-- Cover image center -->
+            <div id="preview-cover-center" class="book-cover-center" style="display: none;">
+              <img id="preview-cover-element" alt="Cover">
+            </div>
+
+            <!-- Title & Author -->
+            <h1 id="preview-title" class="book-title-heading"></h1>
+            <p id="preview-author" class="book-author-sub"></p>
+            <hr class="book-divider">
+
+            <!-- Continuous body paragraphs and styled notes -->
+            <div id="preview-body-blocks"></div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Internal Application Modules -->
+  <script src="js/eml-parser.js"></script>
+  <script src="js/epub-generator.js"></script>
+  <script src="js/pdf-generator.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,375 @@
+:root {
+  --bg-color: #f5f5f7;
+  --card-bg: #ffffff;
+  --text-main: #1d1d1f;
+  --text-muted: #86868b;
+  --primary-accent: #0071e3;
+  --primary-hover: #0077ed;
+  --success-color: #34c759;
+  --border-color: #d2d2d7;
+  --radius-lg: 16px;
+  --radius-md: 10px;
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px 80px;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 36px;
+}
+
+header h1 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 8px;
+}
+
+header p {
+  color: var(--text-muted);
+  font-size: 1.1rem;
+}
+
+/* Two-column layout */
+.main-layout {
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: 32px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .main-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Sidebar & Controls */
+.controls-card {
+  background: var(--card-bg);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.section-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--text-main);
+}
+
+/* Dropzone */
+.dropzone {
+  border: 2px dashed var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 24px 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: #fafafc;
+}
+
+.dropzone:hover, .dropzone.dragover {
+  border-color: var(--primary-accent);
+  background: #f0f7ff;
+}
+
+.dropzone .icon {
+  font-size: 2rem;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.dropzone p {
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.dropzone .sub-text {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.file-input {
+  display: none;
+}
+
+/* Form inputs */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #48484a;
+}
+
+.form-control {
+  font-size: 0.95rem;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: #fff;
+  transition: border-color 0.2s;
+  outline: none;
+}
+
+.form-control:focus {
+  border-color: var(--primary-accent);
+  box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.15);
+}
+
+/* Cover Image Preview */
+.cover-preview-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.cover-thumbnail {
+  width: 60px;
+  height: 85px;
+  border-radius: 4px;
+  object-fit: cover;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+  background: #eee;
+}
+
+.btn-remove-cover {
+  font-size: 0.8rem;
+  color: #ff3b30;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+/* Stats */
+.stats-badge {
+  background: #f0f7ff;
+  border: 1px solid #cce5ff;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 0.88rem;
+  color: #004085;
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Action Buttons */
+.btn-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 18px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-primary {
+  background: var(--primary-accent);
+  color: #fff;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--primary-hover);
+}
+
+.btn-secondary {
+  background: #e5e5ea;
+  color: var(--text-main);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: #d1d1d6;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Preview Area */
+.preview-card {
+  background: var(--card-bg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+}
+
+.preview-header {
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fafafc;
+}
+
+.preview-header h2 {
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.preview-tag {
+  font-size: 0.8rem;
+  background: #e5e5ea;
+  padding: 4px 8px;
+  border-radius: 4px;
+  color: #636366;
+}
+
+/* The Book Page inside Preview */
+.book-paper {
+  background: #fff;
+  padding: 50px 60px;
+  min-height: 600px;
+  max-height: 800px;
+  overflow-y: auto;
+  font-family: Georgia, Palatino, "Times New Roman", serif;
+  color: #222;
+}
+
+@media (max-width: 600px) {
+  .book-paper {
+    padding: 30px 20px;
+  }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 100px 20px;
+  color: var(--text-muted);
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.empty-state .icon {
+  font-size: 3rem;
+  margin-bottom: 12px;
+  display: block;
+}
+
+/* Book Typography */
+.book-title-heading {
+  text-align: center;
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+  color: #111;
+}
+
+.book-author-sub {
+  text-align: center;
+  font-size: 1.25rem;
+  font-style: italic;
+  color: #555;
+  margin-bottom: 30px;
+}
+
+.book-cover-center {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.book-cover-center img {
+  max-width: 200px;
+  max-height: 300px;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.book-divider {
+  width: 80px;
+  height: 2px;
+  background: #333;
+  margin: 20px auto 40px;
+  border: 0;
+}
+
+.book-prose-p {
+  font-size: 1.12rem;
+  line-height: 1.8;
+  margin-bottom: 1.2em;
+  text-align: justify;
+  text-indent: 1.8em;
+}
+
+.book-user-note {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: #f0f7ff;
+  border-left: 4px solid var(--primary-accent);
+  padding: 14px 18px;
+  border-radius: 4px 8px 8px 4px;
+  margin: 1.6em 0;
+  font-style: italic;
+  font-size: 0.98rem;
+  line-height: 1.6;
+  color: #1c3d5a;
+}
+
+.book-user-note::before {
+  content: "Personal Reflection: ";
+  font-weight: 700;
+  font-style: normal;
+  color: var(--primary-accent);
+}
+
+/* Hidden Print container */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #printable-book-content, #printable-book-content * {
+    visibility: visible;
+  }
+  #printable-book-content {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    padding: 0;
+  }
+}
