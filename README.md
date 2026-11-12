@@ -1,4 +1,5 @@
 # Apple Books Notes to EPUB / PDF Converter
+https://aheiner2001.github.io/Books--Apple-export-to-structured-output/ 
 
 A client-side web application built with HTML, CSS, and JavaScript that transforms Apple Books exported `.eml` notes into clean, continuous **EPUB 3** and **PDF** books.
 
